@@ -8,7 +8,7 @@ import { useStores } from "../models"
 import { AppStackScreenProps } from "../navigators"
 import { colors, spacing } from "../theme"
 import { AppStackParamList } from "../navigators/AppNavigator" 
-import { insertUserInfo } from "d:/ReactNative/MoneyMover/app/utils/database";
+import { insertUserInfo } from "../utils/database";
 
 interface AdditionalInfoScreenProps extends AppStackScreenProps<"AdditionalInfo"> {}
 
