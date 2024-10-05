@@ -43,6 +43,24 @@ const en = {
     tapToLogIn: "Tap to log in!",
     hint: "Hint: you can use any email address and your favorite password :)",
   },
+
+  
+    additionalInfoScreen: {
+      "title": "Additional Information",
+      "subtitle": "Please fill in your details",
+      "firstNameFieldLabel": "First Name",
+      "firstNameFieldPlaceholder": "Enter your first name",
+      "lastNameFieldLabel": "Last Name",
+      "lastNameFieldPlaceholder": "Enter your last name",
+      "ageFieldLabel": "Age",
+      "ageFieldPlaceholder": "Enter your age",
+      "addressFieldLabel": "Address",
+      "addressFieldPlaceholder": "Enter your address",
+      "phoneFieldLabel": "Phone Number",
+      "phoneFieldPlaceholder": "Enter your phone number",
+      "submitButton": "Submit"
+    },  
+
   demoNavigator: {
     componentsTab: "Components",
     debugTab: "Debug",

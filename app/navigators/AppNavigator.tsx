@@ -37,6 +37,7 @@ import { colors } from "app/theme"
 export type AppStackParamList = {
   Welcome: undefined
   Login: undefined
+  AdditionalInfo: undefined;
   Demo: NavigatorScreenParams<DemoTabParamList>
   // 🔥 Your screens go here
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
@@ -75,6 +76,7 @@ const AppStack = observer(function AppStack() {
       ) : (
         <>
           <Stack.Screen name="Login" component={Screens.LoginScreen} />
+          <Stack.Screen name="AdditionalInfo" component={Screens.AdditionalInfoScreen} />
         </>
       )}
 
