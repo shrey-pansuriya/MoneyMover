@@ -8,6 +8,7 @@ import { useStores } from "../models"
 import { AppStackScreenProps } from "../navigators"
 import { colors, spacing } from "../theme"
 import { AppStackParamList } from "../navigators/AppNavigator" 
+import { insertUserInfo } from "d:/ReactNative/MoneyMover/app/utils/database";
 
 interface AdditionalInfoScreenProps extends AppStackScreenProps<"AdditionalInfo"> {}
 
@@ -18,15 +19,51 @@ export const AdditionalInfoScreen: FC<AdditionalInfoScreenProps> = observer(func
   const [address, setAddress] = useState("")
   const [phone, setPhone] = useState("")
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
+
+  const validateInput = () => {
+    // Reset the error message
+    setErrorMessage("");
+
+    // Check for empty fields
+    if (!firstName || !lastName || !age || !address || !phone) {
+      setErrorMessage("All fields are required.");
+      return false;
+    }
+
+    // Validate age: should be a non-zero integer
+    const ageNum = parseInt(age);
+    if (isNaN(ageNum) || ageNum <= 0) {
+      setErrorMessage("Age must be a non-zero integer.");
+      return false;
+    }
+
+    // Validate phone: should be a valid phone number format (example for a 10-digit phone number)
+    const phoneRegex = /^[0-9]{10}$/; // Adjust this regex according to your needs
+    if (!phoneRegex.test(phone)) {
+      setErrorMessage("Phone number must be a valid 10-digit number.");
+      return false;
+    }
+
+    return true; // Return true if all validations pass
+  }
 
   const handleSubmit = () => {
     setIsSubmitted(true)
+
+    // Validate inputs before submitting
+    if (!validateInput()) {
+        return; // Exit if validation fails
+      }
 
     // Handle submission logic, e.g., validation or saving data to state/store
     if (!firstName || !lastName || !age || !address || !phone) {
       // Display an error message or handle the error
       return
     }
+    
+    // Insert the user info into the SQLite database
+    insertUserInfo(firstName, lastName, parseInt(age), address, phone);
 
     // Mock submission - you can replace this with actual API call or state update
     console.log({ firstName, lastName, age, address, phone })

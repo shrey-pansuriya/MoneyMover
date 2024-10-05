@@ -16,6 +16,9 @@ if (__DEV__) {
   // If you turn it off in metro.config.js, you'll have to manually import it.
   require("./devtools/ReactotronConfig.ts")
 }
+
+import { createTable } from "d:/ReactNative/MoneyMover/app/utils/database"; // Adjust the import based on your file structure
+
 import "./utils/gestureHandler"
 import "./i18n"
 import "./utils/ignoreWarnings"
@@ -74,6 +77,9 @@ function App(props: AppProps) {
 
   const { rehydrated } = useInitialRootStore(() => {
     // This runs after the root store has been initialized and rehydrated.
+
+    // Create the database tables
+    createTable();    
 
     // If your initialization scripts run very fast, it's good to show the splash screen for just a bit longer to prevent flicker.
     // Slightly delaying splash screen hiding for better UX; can be customized or removed as needed,
