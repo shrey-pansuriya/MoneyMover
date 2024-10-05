@@ -17,7 +17,7 @@ if (__DEV__) {
   require("./devtools/ReactotronConfig.ts")
 }
 
-import { createTable } from "d:/ReactNative/MoneyMover/app/utils/database"; // Adjust the import based on your file structure
+import { createTable } from "app/utils/database"; // Adjust the import based on your file structure
 
 import "./utils/gestureHandler"
 import "./i18n"
