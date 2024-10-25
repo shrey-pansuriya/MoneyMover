@@ -78,6 +78,12 @@ export const DemoDebugScreen: FC<DemoTabScreenProps<"Settings">> = function Demo
           }
         />
       </View>
+      {/* New Change Profile Info Button above Contact Us */}
+      <View style={$buttonContainer}>
+      <Button style={$button} onPress={() => { /* No action for now */ }}>
+          Change Profile Info
+        </Button>
+      </View>
       <View style={$buttonContainer}>
         <Button style={$button} onPress={() => setModalVisible(true)}>
           Contact Us
@@ -100,12 +106,6 @@ const $container: ViewStyle = {
 
 const $title: TextStyle = {
   marginBottom: spacing.xxl,
-}
-
-const $reportBugsLink: TextStyle = {
-  color: colors.tint,
-  marginBottom: spacing.lg,
-  alignSelf: isRTL ? "flex-start" : "flex-end",
 }
 
 const $item: ViewStyle = {
