@@ -13,7 +13,7 @@ import { AppStackParamList, AppStackScreenProps } from "./AppNavigator"
 export type DemoTabParamList = {
   DemoCommunity: undefined
   DemoShowroom: { queryIndex?: string; itemIndex?: string }
-  DemoDebug: undefined
+  Settings: undefined
   DemoPodcastList: undefined
 }
 
@@ -86,12 +86,12 @@ export function DemoNavigator() {
       />
 
       <Tab.Screen
-        name="DemoDebug"
+        name="Settings"
         component={DemoDebugScreen}
         options={{
           tabBarLabel: translate("demoNavigator.debugTab"),
           tabBarIcon: ({ focused }) => (
-            <Icon icon="debug" color={focused ? colors.tint : undefined} size={30} />
+            <Icon icon="settings" color={focused ? colors.tint : undefined} size={30} />
           ),
         }}
       />

@@ -15,7 +15,7 @@ function openLinkInBrowser(url: string) {
   Linking.canOpenURL(url).then((canOpen) => canOpen && Linking.openURL(url))
 }
 
-export const DemoDebugScreen: FC<DemoTabScreenProps<"DemoDebug">> = function DemoDebugScreen(
+export const DemoDebugScreen: FC<DemoTabScreenProps<"Settings">> = function DemoDebugScreen(
   _props,
 ) {
   const {
