@@ -1,6 +1,6 @@
 import React, { FC } from "react"
 import * as Application from "expo-application"
-import { Linking, Platform, TextStyle, View, ViewStyle } from "react-native"
+import { Alert, Linking, Platform, TextStyle, View, ViewStyle } from "react-native"
 import { Button, ListItem, Screen, Text } from "../components"
 import { DemoTabScreenProps } from "../navigators/DemoNavigator"
 import { colors, spacing } from "../theme"
@@ -8,11 +8,16 @@ import { isRTL } from "../i18n"
 import { useStores } from "../models"
 
 /**
- * @param {string} url - The URL to open in the browser.
- * @returns {void} - No return value.
+ * Function to display contact information.
  */
-function openLinkInBrowser(url: string) {
-  Linking.canOpenURL(url).then((canOpen) => canOpen && Linking.openURL(url))
+function showContactInfo() {
+  Alert.alert(
+    "Contact Us",
+    "Company Address: 123 Main St, Springfield, USA\n" +
+    "Helpline Number: +1 234 567 890\n" +
+    "Customer Support Email: support@example.com",
+    [{ text: "OK" }]
+  )
 }
 
 export const DemoDebugScreen: FC<DemoTabScreenProps<"Settings">> = function DemoDebugScreen(
@@ -22,36 +27,8 @@ export const DemoDebugScreen: FC<DemoTabScreenProps<"Settings">> = function Demo
     authenticationStore: { logout },
   } = useStores()
 
-  const usingHermes = typeof HermesInternal === "object" && HermesInternal !== null
-  // @ts-expect-error
-  const usingFabric = global.nativeFabricUIManager != null
-
-  const demoReactotron = React.useMemo(
-    () => async () => {
-      if (__DEV__) {
-        console.tron.display({
-          name: "DISPLAY",
-          value: {
-            appId: Application.applicationId,
-            appName: Application.applicationName,
-            appVersion: Application.nativeApplicationVersion,
-            appBuildVersion: Application.nativeBuildVersion,
-            hermesEnabled: usingHermes,
-          },
-          important: true,
-        })
-      }
-    },
-    [],
-  )
-
   return (
     <Screen preset="scroll" safeAreaEdges={["top"]} contentContainerStyle={$container}>
-      <Text
-        style={$reportBugsLink}
-        tx="demoDebugScreen.reportBugs"
-        onPress={() => openLinkInBrowser("https://github.com/infinitered/ignite/issues")}
-      />
       <Text style={$title} preset="heading" tx="demoDebugScreen.title" />
       <View style={$itemsContainer}>
         <ListItem
@@ -86,26 +63,9 @@ export const DemoDebugScreen: FC<DemoTabScreenProps<"Settings">> = function Demo
             </View>
           }
         />
-        <ListItem
-          LeftComponent={
-            <View style={$item}>
-              <Text preset="bold">Hermes Enabled</Text>
-              <Text>{String(usingHermes)}</Text>
-            </View>
-          }
-        />
-        <ListItem
-          LeftComponent={
-            <View style={$item}>
-              <Text preset="bold">Fabric Enabled</Text>
-              <Text>{String(usingFabric)}</Text>
-            </View>
-          }
-        />
       </View>
       <View style={$buttonContainer}>
-        <Button style={$button} tx="demoDebugScreen.reactotron" onPress={demoReactotron} />
-        <Text style={$hint} tx={`demoDebugScreen.${Platform.OS}ReactotronHint` as const} />
+        <Button style={$button} text="Contact Us" onPress={showContactInfo} />
       </View>
       <View style={$buttonContainer}>
         <Button style={$button} tx="common.logOut" onPress={logout} />
@@ -144,11 +104,4 @@ const $button: ViewStyle = {
 
 const $buttonContainer: ViewStyle = {
   marginBottom: spacing.md,
-}
-
-const $hint: TextStyle = {
-  color: colors.palette.neutral600,
-  fontSize: 12,
-  lineHeight: 15,
-  paddingBottom: spacing.lg,
 }
