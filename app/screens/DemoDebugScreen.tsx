@@ -1,6 +1,6 @@
-import React, { FC } from "react"
+import React, { FC, useState } from "react"
 import * as Application from "expo-application"
-import { Alert, Linking, Platform, TextStyle, View, ViewStyle } from "react-native"
+import { Modal, View, ViewStyle, TextStyle, TouchableOpacity } from "react-native"
 import { Button, ListItem, Screen, Text } from "../components"
 import { DemoTabScreenProps } from "../navigators/DemoNavigator"
 import { colors, spacing } from "../theme"
@@ -8,17 +8,29 @@ import { isRTL } from "../i18n"
 import { useStores } from "../models"
 
 /**
- * Function to display contact information.
+ * Component to display contact information modal.
  */
-function showContactInfo() {
-  Alert.alert(
-    "Contact Us",
-    "Company Address: 123 Main St, Springfield, USA\n" +
-    "Helpline Number: +1 234 567 890\n" +
-    "Customer Support Email: support@example.com",
-    [{ text: "OK" }]
-  )
-}
+const ContactInfoModal: FC<{ visible: boolean; onClose: () => void }> = ({ visible, onClose }) => (
+  <Modal
+    transparent={true}
+    visible={visible}
+    animationType="slide"
+  >
+    <View style={modalStyles.container}>
+      <View style={modalStyles.innerContainer}>
+        <Text style={modalStyles.title}>Contact Us</Text>
+        <Text style={modalStyles.info}>
+          Company Address: 123 Main St, Springfield, USA{"\n"}
+          Helpline Number: +1 234 567 890{"\n"}
+          Customer Support Email: support@example.com
+        </Text>
+        <TouchableOpacity style={modalStyles.button} onPress={onClose}>
+          <Text style={modalStyles.buttonText}>Close</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </Modal>
+);
 
 export const DemoDebugScreen: FC<DemoTabScreenProps<"Settings">> = function DemoDebugScreen(
   _props,
@@ -26,6 +38,8 @@ export const DemoDebugScreen: FC<DemoTabScreenProps<"Settings">> = function Demo
   const {
     authenticationStore: { logout },
   } = useStores()
+
+  const [modalVisible, setModalVisible] = useState(false)
 
   return (
     <Screen preset="scroll" safeAreaEdges={["top"]} contentContainerStyle={$container}>
@@ -65,11 +79,15 @@ export const DemoDebugScreen: FC<DemoTabScreenProps<"Settings">> = function Demo
         />
       </View>
       <View style={$buttonContainer}>
-        <Button style={$button} text="Contact Us" onPress={showContactInfo} />
+        <Button style={$button} onPress={() => setModalVisible(true)}>
+          Contact Us
+        </Button>
       </View>
       <View style={$buttonContainer}>
         <Button style={$button} tx="common.logOut" onPress={logout} />
       </View>
+
+      <ContactInfoModal visible={modalVisible} onClose={() => setModalVisible(false)} />
     </Screen>
   )
 }
@@ -104,4 +122,42 @@ const $button: ViewStyle = {
 
 const $buttonContainer: ViewStyle = {
   marginBottom: spacing.md,
+}
+
+const modalStyles = {
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+  } as ViewStyle,
+  innerContainer: {
+    width: '80%',
+    padding: spacing.lg,
+    backgroundColor: colors.palette.neutral100,
+    borderRadius: 10,
+    alignItems: 'center',
+    elevation: 5, // Shadow effect on Android
+  } as ViewStyle,
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: spacing.md,
+  } as TextStyle,
+  info: {
+    fontSize: 16,
+    marginBottom: spacing.lg,
+    textAlign: 'center',
+  } as TextStyle,
+  button: {
+    padding: spacing.sm,
+    backgroundColor: colors.tint,
+    borderRadius: 5,
+    width: '100%',
+    alignItems: 'center',
+  } as ViewStyle,
+  buttonText: {
+    color: colors.palette.neutral100,
+    fontSize: 16,
+  } as TextStyle,
 }
