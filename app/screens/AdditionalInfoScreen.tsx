@@ -123,6 +123,11 @@ export const AdditionalInfoScreen: FC<AdditionalInfoScreenProps> = observer(func
         keyboardType="phone-pad"
       />
 
+      {/* Error message display */}
+      {errorMessage ? (
+        <Text style={$errorMessageText}>{errorMessage}</Text>
+      ) : null}
+
       <Button
         testID="additional-info-submit-button"
         tx="additionalInfoScreen.submitButton"
@@ -152,4 +157,10 @@ const $textField: ViewStyle = {
 
 const $submitButton: ViewStyle = {
   marginTop: spacing.xs,
+}
+
+const $errorMessageText: TextStyle = {
+  color: colors.error,  // Assuming `colors.error` is set to a red color in your theme
+  marginBottom: spacing.lg,
+  textAlign: "center",
 }
