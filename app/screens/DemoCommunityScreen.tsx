@@ -106,7 +106,7 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
           <View
             style={[
               $subscriptionOption,
-              { backgroundColor: "#f39c12", opacity: selectedPlan === "gold" ? 0.5 : 1 }
+              { backgroundColor: "#f39c12", opacity: selectedPlan === "gold" ? 1 : 0.5 }
             ]}
           >
             <Text style={[$planName, { color: "#000" }]}>GOLD - $400</Text>
