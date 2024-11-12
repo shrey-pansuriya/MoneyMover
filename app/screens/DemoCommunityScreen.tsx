@@ -27,7 +27,7 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
       switch (plan) {
         case "basic":
           return (
-            <Text style={$policyText}>
+            <Text style={[$policyText, { color: "#fff" }]}>
               - Minimum of 15 days before requesting a claim.{"\n"}
               - Must participate in at least one donation or complete the first subscription payment by the end of the month.{"\n"}
               - Unused funds are transferred to a shared pool if not involved in P2P transactions.
@@ -35,7 +35,7 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
           )
         case "premium":
           return (
-            <Text style={$policyText}>
+            <Text style={[$policyText, { color: "#000" }]}>
               - Minimum of 10 days before requesting a claim.{"\n"}
               - Must participate in a donation or complete the first subscription payment by the end of the month.{"\n"}
               - Unused funds go to the shared pool if not used for P2P transactions.{"\n"}
@@ -44,7 +44,7 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
           )
         case "gold":
           return (
-            <Text style={$policyText}>
+            <Text style={[$policyText, { color: "#000" }]}>
               - Minimum of 5 days before requesting a claim.{"\n"}
               - Must participate in a donation or complete the first subscription payment by the end of the month.{"\n"}
               - Unused funds go to the shared pool if not involved in P2P transactions.{"\n"}
