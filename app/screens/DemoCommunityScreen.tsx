@@ -5,12 +5,6 @@ import { DemoTabScreenProps } from "../navigators/DemoNavigator"
 import { spacing } from "../theme"
 import { i18n } from "../i18n"
 
-// Image imports (if used in the future)
-const chainReactLogo = require("../../assets/images/demo/cr-logo.png")
-const reactNativeLiveLogo = require("../../assets/images/demo/rnl-logo.png")
-const reactNativeRadioLogo = require("../../assets/images/demo/rnr-logo.png")
-const reactNativeNewsletterLogo = require("../../assets/images/demo/rnn-logo.png")
-
 export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
   function DemoCommunityScreen(_props) {
     const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
@@ -34,7 +28,7 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
           <View
             style={[
               $subscriptionOption,
-              { backgroundColor: "#2f2f2f", opacity: selectedPlan === "basic" ? 1 : 1 } // Keep opacity at 100% by default
+              { backgroundColor: "#2f2f2f", opacity: selectedPlan === "basic" ? 1 : 0.5 }
             ]}
           >
             <Text style={[$planName, { color: "#fff" }]}>BASIC - $200</Text>
@@ -52,6 +46,7 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
                       handleSelectPlan("basic")
                     }
                   }}
+                  color="black"
                 />
               </View>
               <View style={$buttonContainer}>
@@ -62,6 +57,7 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
                       handleCancelSubscription("basic")
                     }
                   }}
+                  color="black"
                 />
               </View>
             </View>
@@ -71,7 +67,7 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
           <View
             style={[
               $subscriptionOption,
-              { backgroundColor: "#2ecc71", opacity: selectedPlan === "premium" ? 1 : 0.5 } // Opacity reduces to 50% when not selected
+              { backgroundColor: "#2ecc71", opacity: selectedPlan === "premium" ? 1 : 0.5 }
             ]}
           >
             <Text style={[$planName, { color: "#000" }]}>PREMIUM - $300</Text>
@@ -89,6 +85,7 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
                       handleSelectPlan("premium")
                     }
                   }}
+                  color="black"
                 />
               </View>
               <View style={$buttonContainer}>
@@ -99,6 +96,7 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
                       handleCancelSubscription("premium")
                     }
                   }}
+                  color="black"
                 />
               </View>
             </View>
@@ -108,7 +106,7 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
           <View
             style={[
               $subscriptionOption,
-              { backgroundColor: "#f39c12", opacity: selectedPlan === "gold" ? 1 : 0.5 } // Opacity reduces to 50% when not selected
+              { backgroundColor: "#f39c12", opacity: selectedPlan === "gold" ? 1 : 0.5 }
             ]}
           >
             <Text style={[$planName, { color: "#000" }]}>GOLD - $400</Text>
@@ -126,6 +124,7 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
                       handleSelectPlan("gold")
                     }
                   }}
+                  color="black"
                 />
               </View>
               <View style={$buttonContainer}>
@@ -136,12 +135,12 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
                       handleCancelSubscription("gold")
                     }
                   }}
+                  color="black"
                 />
               </View>
             </View>
           </View>
         </View>
-
       </Screen>
     )
   }
@@ -209,7 +208,7 @@ const $buttonWrapper: ViewStyle = {
 }
 
 const $buttonContainer: ViewStyle = {
-  backgroundColor: "#fff", // Same button background as before
+  backgroundColor: "#fff",
   borderRadius: 5,
   overflow: "hidden",
   flex: 1,
