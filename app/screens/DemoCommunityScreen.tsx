@@ -213,7 +213,7 @@ const $buttonContainer: ViewStyle = {
   borderRadius: 5,
   overflow: "hidden",
   flex: 1,
-  marginHorizontal: 5,
+  marginHorizontal: 0,
   justifyContent: "center",
   paddingVertical: 0, // Removes any vertical padding
   paddingHorizontal: 0, // Removes any horizontal padding
