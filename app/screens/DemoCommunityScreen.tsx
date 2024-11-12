@@ -1,10 +1,10 @@
 import React, { FC } from "react"
-import { Image, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
-import { ListItem, Screen, Text } from "../components"
+import { Button, Image, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
+import { Screen, Text } from "../components"
 import { DemoTabScreenProps } from "../navigators/DemoNavigator"
 import { spacing } from "../theme"
-import { openLinkInBrowser } from "../utils/openLinkInBrowser"
 import { isRTL } from "../i18n"
+import { i18n } from "../i18n" // Assuming i18n is properly set up
 
 const chainReactLogo = require("../../assets/images/demo/cr-logo.png")
 const reactNativeLiveLogo = require("../../assets/images/demo/rnl-logo.png")
@@ -15,90 +15,48 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
   function DemoCommunityScreen(_props) {
     return (
       <Screen preset="scroll" contentContainerStyle={$container} safeAreaEdges={["top"]}>
-        <Text preset="heading" tx="demoCommunityScreen.title" style={$title} />
-        <Text tx="demoCommunityScreen.tagLine" style={$tagline} />
+        <Text preset="heading" tx="demoCommunityScreen.subscriptionOptionsTitle" style={$title} />
+        <Text tx="demoCommunityScreen.subscriptionOptionsSubtitle" style={$tagline} />
 
-        <Text preset="subheading" tx="demoCommunityScreen.joinUsOnSlackTitle" />
-        <Text tx="demoCommunityScreen.joinUsOnSlack" style={$description} />
-        <ListItem
-          tx="demoCommunityScreen.joinSlackLink"
-          leftIcon="slack"
-          rightIcon={isRTL ? "caretLeft" : "caretRight"}
-          onPress={() => openLinkInBrowser("https://community.infinite.red/")}
-        />
-        <Text
-          preset="subheading"
-          tx="demoCommunityScreen.makeIgniteEvenBetterTitle"
-          style={$sectionTitle}
-        />
-        <Text tx="demoCommunityScreen.makeIgniteEvenBetter" style={$description} />
-        <ListItem
-          tx="demoCommunityScreen.contributeToIgniteLink"
-          leftIcon="github"
-          rightIcon={isRTL ? "caretLeft" : "caretRight"}
-          onPress={() => openLinkInBrowser("https://github.com/infinitered/ignite")}
-        />
+        <View style={$subscriptionOptionsContainer}>
+          {/* Basic Subscription */}
+          <View style={$subscriptionOption}>
+            <Text tx="demoCommunityScreen.basicSubscriptionDescription" style={$description} />
+            <Text style={$price}>${i18n.t("demoCommunityScreen.basicSubscriptionPrice")}</Text>
+            <Button title={i18n.t("demoCommunityScreen.purchaseButton")} onPress={() => handlePurchase("basic")} />
+            <Button title={i18n.t("demoCommunityScreen.viewBenefitsButton")} onPress={() => handleViewBenefits("basic")} />
+          </View>
 
-        <Text
-          preset="subheading"
-          tx="demoCommunityScreen.theLatestInReactNativeTitle"
-          style={$sectionTitle}
-        />
-        <Text tx="demoCommunityScreen.theLatestInReactNative" style={$description} />
-        <ListItem
-          tx="demoCommunityScreen.reactNativeRadioLink"
-          bottomSeparator
-          rightIcon={isRTL ? "caretLeft" : "caretRight"}
-          LeftComponent={
-            <View style={$logoContainer}>
-              <Image source={reactNativeRadioLogo} style={$logo} />
-            </View>
-          }
-          onPress={() => openLinkInBrowser("https://reactnativeradio.com/")}
-        />
-        <ListItem
-          tx="demoCommunityScreen.reactNativeNewsletterLink"
-          bottomSeparator
-          rightIcon={isRTL ? "caretLeft" : "caretRight"}
-          LeftComponent={
-            <View style={$logoContainer}>
-              <Image source={reactNativeNewsletterLogo} style={$logo} />
-            </View>
-          }
-          onPress={() => openLinkInBrowser("https://reactnativenewsletter.com/")}
-        />
-        <ListItem
-          tx="demoCommunityScreen.reactNativeLiveLink"
-          bottomSeparator
-          rightIcon={isRTL ? "caretLeft" : "caretRight"}
-          LeftComponent={
-            <View style={$logoContainer}>
-              <Image source={reactNativeLiveLogo} style={$logo} />
-            </View>
-          }
-          onPress={() => openLinkInBrowser("https://rn.live/")}
-        />
-        <ListItem
-          tx="demoCommunityScreen.chainReactConferenceLink"
-          rightIcon={isRTL ? "caretLeft" : "caretRight"}
-          LeftComponent={
-            <View style={$logoContainer}>
-              <Image source={chainReactLogo} style={$logo} />
-            </View>
-          }
-          onPress={() => openLinkInBrowser("https://cr.infinite.red/")}
-        />
-        <Text preset="subheading" tx="demoCommunityScreen.hireUsTitle" style={$sectionTitle} />
-        <Text tx="demoCommunityScreen.hireUs" style={$description} />
-        <ListItem
-          tx="demoCommunityScreen.hireUsLink"
-          leftIcon="clap"
-          rightIcon={isRTL ? "caretLeft" : "caretRight"}
-          onPress={() => openLinkInBrowser("https://infinite.red/contact")}
-        />
+          {/* Premium Subscription */}
+          <View style={$subscriptionOption}>
+            <Text tx="demoCommunityScreen.premiumSubscriptionDescription" style={$description} />
+            <Text style={$price}>${i18n.t("demoCommunityScreen.premiumSubscriptionPrice")}</Text>
+            <Button title={i18n.t("demoCommunityScreen.purchaseButton")} onPress={() => handlePurchase("premium")} />
+            <Button title={i18n.t("demoCommunityScreen.viewBenefitsButton")} onPress={() => handleViewBenefits("premium")} />
+          </View>
+
+          {/* Gold Subscription */}
+          <View style={$subscriptionOption}>
+            <Text tx="demoCommunityScreen.goldSubscriptionDescription" style={$description} />
+            <Text style={$price}>${i18n.t("demoCommunityScreen.goldSubscriptionPrice")}</Text>
+            <Button title={i18n.t("demoCommunityScreen.purchaseButton")} onPress={() => handlePurchase("gold")} />
+            <Button title={i18n.t("demoCommunityScreen.viewBenefitsButton")} onPress={() => handleViewBenefits("gold")} />
+          </View>
+        </View>
+
       </Screen>
     )
   }
+
+const handlePurchase = (subscriptionType: string) => {
+  // Implement purchase logic here
+  console.log(`Purchasing ${subscriptionType} plan`)
+}
+
+const handleViewBenefits = (subscriptionType: string) => {
+  // Implement benefits viewing logic here
+  console.log(`Viewing benefits of ${subscriptionType} plan`)
+}
 
 const $container: ViewStyle = {
   paddingTop: spacing.lg + spacing.xl,
@@ -121,15 +79,21 @@ const $sectionTitle: TextStyle = {
   marginTop: spacing.xxl,
 }
 
-const $logoContainer: ViewStyle = {
-  marginEnd: spacing.md,
-  flexDirection: "row",
-  flexWrap: "wrap",
-  alignContent: "center",
-  alignSelf: "stretch",
+const $subscriptionOptionsContainer: ViewStyle = {
+  marginTop: spacing.xxl,
 }
 
-const $logo: ImageStyle = {
-  height: 38,
-  width: 38,
+const $subscriptionOption: ViewStyle = {
+  padding: spacing.lg,
+  marginBottom: spacing.lg,
+  borderWidth: 1,
+  borderRadius: 8,
+  borderColor: "#ccc",
 }
+
+const $price: TextStyle = {
+  fontSize: 18,
+  fontWeight: "bold",
+  marginTop: spacing.sm,
+}
+

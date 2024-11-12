@@ -89,6 +89,17 @@ const en = {
     hireUs:
       "Whether it's running a full project or getting teams up to speed with our hands-on training, Infinite Red can help with just about any React Native project.",
     hireUsLink: "Send us a message",
+
+    subscriptionOptionsTitle: "Choose Your Subscription Plan",
+    subscriptionOptionsSubtitle: "Select from the following plans to get started.",
+    basicSubscriptionDescription: "Access to basic features with limited support.",
+    premiumSubscriptionDescription: "Access to all features with priority support.",
+    goldSubscriptionDescription: "All features with VIP support and exclusive perks.",
+    basicSubscriptionPrice: "200",
+    premiumSubscriptionPrice: "300",
+    goldSubscriptionPrice: "400",
+    purchaseButton: "Purchase",
+    viewBenefitsButton: "View Benefits",
   },
   demoShowroomScreen: {
     jumpStart: "Components to jump start your project!",
