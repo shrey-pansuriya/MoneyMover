@@ -51,7 +51,7 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
               </View>
               <View style={$buttonContainer}>
                 <Button
-                  title={selectedPlan === "basic" ? "Cancel Subscription" : i18n.t("demoCommunityScreen.viewBenefitsButton")}
+                  title={selectedPlan === "basic" ? "Cancel" : i18n.t("demoCommunityScreen.viewBenefitsButton")}
                   onPress={() => {
                     if (selectedPlan === "basic") {
                       handleCancelSubscription("basic")
@@ -90,7 +90,7 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
               </View>
               <View style={$buttonContainer}>
                 <Button
-                  title={selectedPlan === "premium" ? "Cancel Subscription" : i18n.t("demoCommunityScreen.viewBenefitsButton")}
+                  title={selectedPlan === "premium" ? "Cancel" : i18n.t("demoCommunityScreen.viewBenefitsButton")}
                   onPress={() => {
                     if (selectedPlan === "premium") {
                       handleCancelSubscription("premium")
@@ -106,7 +106,7 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
           <View
             style={[
               $subscriptionOption,
-              { backgroundColor: "#f39c12", opacity: selectedPlan === "gold" ? 1 : 0.5 }
+              { backgroundColor: "#f39c12", opacity: selectedPlan === "gold" ? 0.5 : 1 }
             ]}
           >
             <Text style={[$planName, { color: "#000" }]}>GOLD - $400</Text>
@@ -129,7 +129,7 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
               </View>
               <View style={$buttonContainer}>
                 <Button
-                  title={selectedPlan === "gold" ? "Cancel Subscription" : i18n.t("demoCommunityScreen.viewBenefitsButton")}
+                  title={selectedPlan === "gold" ? "Cancel" : i18n.t("demoCommunityScreen.viewBenefitsButton")}
                   onPress={() => {
                     if (selectedPlan === "gold") {
                       handleCancelSubscription("gold")
