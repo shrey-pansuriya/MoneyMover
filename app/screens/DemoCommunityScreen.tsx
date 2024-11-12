@@ -117,13 +117,14 @@ const $subscriptionOptionsContainer: ViewStyle = {
 }
 
 const $subscriptionOption: ViewStyle = {
-  padding: spacing.lg,
+  padding: spacing.xl, // Increased padding for bigger box
   marginBottom: spacing.lg,
   borderRadius: 10,
   shadowColor: "#000",
   shadowOffset: { width: 0, height: 2 },
   shadowOpacity: 0.1,
   shadowRadius: 5,
+  minHeight: 200, // Ensures there's enough height for large text
 }
 
 const $buttonWrapper: ViewStyle = {
