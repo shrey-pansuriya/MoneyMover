@@ -1,4 +1,4 @@
-import React, { FC } from "react"
+import React, { FC, useState } from "react"
 import { Button, TextStyle, View, ViewStyle } from "react-native"
 import { Screen, Text } from "../components"
 import { DemoTabScreenProps } from "../navigators/DemoNavigator"
@@ -13,6 +13,17 @@ const reactNativeNewsletterLogo = require("../../assets/images/demo/rnn-logo.png
 
 export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
   function DemoCommunityScreen(_props) {
+    const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
+
+    const handleSelectPlan = (plan: string) => {
+      setSelectedPlan(plan)
+    }
+
+    const handleCancelSubscription = (plan: string) => {
+      setSelectedPlan(null)
+      console.log(`Cancelled subscription for ${plan} plan`)
+    }
+
     return (
       <Screen preset="scroll" contentContainerStyle={$container} safeAreaEdges={["top"]}>
         <Text preset="heading" tx="demoCommunityScreen.subscriptionOptionsTitle" style={$title} />
@@ -20,49 +31,112 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
 
         <View style={$subscriptionOptionsContainer}>
           {/* Basic Subscription */}
-          <View style={[$subscriptionOption, { backgroundColor: "#2f2f2f" }]}>
+          <View
+            style={[
+              $subscriptionOption,
+              { backgroundColor: "#2f2f2f", opacity: selectedPlan === "basic" ? 1 : 0.5 }
+            ]}
+          >
             <Text style={[$planName, { color: "#fff" }]}>BASIC - $200</Text>
             <Text style={[$description, { color: "#fff" }]}>
               {i18n.t("demoCommunityScreen.basicSubscriptionDescription")}
             </Text>
             <View style={$buttonWrapper}>
               <View style={$buttonContainer}>
-                <Button title={i18n.t("demoCommunityScreen.purchaseButton")} onPress={() => handlePurchase("basic")} color="black" />
+                <Button
+                  title={selectedPlan === "basic" ? "Active" : i18n.t("demoCommunityScreen.purchaseButton")}
+                  onPress={() => {
+                    if (selectedPlan === "basic") {
+                      handleCancelSubscription("basic")
+                    } else {
+                      handleSelectPlan("basic")
+                    }
+                  }}
+                />
               </View>
               <View style={$buttonContainer}>
-                <Button title={i18n.t("demoCommunityScreen.viewBenefitsButton")} onPress={() => handleViewBenefits("basic")} color="black" />
+                <Button
+                  title={selectedPlan === "basic" ? "Cancel Subscription" : i18n.t("demoCommunityScreen.viewBenefitsButton")}
+                  onPress={() => {
+                    if (selectedPlan === "basic") {
+                      handleCancelSubscription("basic")
+                    }
+                  }}
+                />
               </View>
             </View>
           </View>
 
           {/* Premium Subscription */}
-          <View style={[$subscriptionOption, { backgroundColor: "#2ecc71" }]}>
+          <View
+            style={[
+              $subscriptionOption,
+              { backgroundColor: "#2ecc71", opacity: selectedPlan === "premium" ? 1 : 0.5 }
+            ]}
+          >
             <Text style={[$planName, { color: "#000" }]}>PREMIUM - $300</Text>
             <Text style={$description}>
               {i18n.t("demoCommunityScreen.premiumSubscriptionDescription")}
             </Text>
             <View style={$buttonWrapper}>
               <View style={$buttonContainer}>
-                <Button title={i18n.t("demoCommunityScreen.purchaseButton")} onPress={() => handlePurchase("premium")} color="black" />
+                <Button
+                  title={selectedPlan === "premium" ? "Active" : i18n.t("demoCommunityScreen.purchaseButton")}
+                  onPress={() => {
+                    if (selectedPlan === "premium") {
+                      handleCancelSubscription("premium")
+                    } else {
+                      handleSelectPlan("premium")
+                    }
+                  }}
+                />
               </View>
               <View style={$buttonContainer}>
-                <Button title={i18n.t("demoCommunityScreen.viewBenefitsButton")} onPress={() => handleViewBenefits("premium")} color="black" />
+                <Button
+                  title={selectedPlan === "premium" ? "Cancel Subscription" : i18n.t("demoCommunityScreen.viewBenefitsButton")}
+                  onPress={() => {
+                    if (selectedPlan === "premium") {
+                      handleCancelSubscription("premium")
+                    }
+                  }}
+                />
               </View>
             </View>
           </View>
 
           {/* Gold Subscription */}
-          <View style={[$subscriptionOption, { backgroundColor: "#f39c12" }]}>
+          <View
+            style={[
+              $subscriptionOption,
+              { backgroundColor: "#f39c12", opacity: selectedPlan === "gold" ? 1 : 0.5 }
+            ]}
+          >
             <Text style={[$planName, { color: "#000" }]}>GOLD - $400</Text>
             <Text style={$description}>
               {i18n.t("demoCommunityScreen.goldSubscriptionDescription")}
             </Text>
             <View style={$buttonWrapper}>
               <View style={$buttonContainer}>
-                <Button title={i18n.t("demoCommunityScreen.purchaseButton")} onPress={() => handlePurchase("gold")} color="black" />
+                <Button
+                  title={selectedPlan === "gold" ? "Active" : i18n.t("demoCommunityScreen.purchaseButton")}
+                  onPress={() => {
+                    if (selectedPlan === "gold") {
+                      handleCancelSubscription("gold")
+                    } else {
+                      handleSelectPlan("gold")
+                    }
+                  }}
+                />
               </View>
               <View style={$buttonContainer}>
-                <Button title={i18n.t("demoCommunityScreen.viewBenefitsButton")} onPress={() => handleViewBenefits("gold")} color="black" />
+                <Button
+                  title={selectedPlan === "gold" ? "Cancel Subscription" : i18n.t("demoCommunityScreen.viewBenefitsButton")}
+                  onPress={() => {
+                    if (selectedPlan === "gold") {
+                      handleCancelSubscription("gold")
+                    }
+                  }}
+                />
               </View>
             </View>
           </View>
