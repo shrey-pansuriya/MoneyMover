@@ -8,6 +8,7 @@ import { i18n } from "../i18n"
 export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
   function DemoCommunityScreen(_props) {
     const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
+    const [showPolicy, setShowPolicy] = useState<string | null>(null)
 
     const handleSelectPlan = (plan: string) => {
       setSelectedPlan(plan)
@@ -16,6 +17,43 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
     const handleCancelSubscription = (plan: string) => {
       setSelectedPlan(null)
       console.log(`Cancelled subscription for ${plan} plan`)
+    }
+
+    const handleViewBenefits = (plan: string) => {
+      setShowPolicy(showPolicy === plan ? null : plan)
+    }
+
+    const renderPolicies = (plan: string) => {
+      switch (plan) {
+        case "basic":
+          return (
+            <Text style={$policyText}>
+              - Minimum of 15 days before requesting a claim.{"\n"}
+              - Must participate in at least one donation or complete the first subscription payment by the end of the month.{"\n"}
+              - Unused funds are transferred to a shared pool if not involved in P2P transactions.
+            </Text>
+          )
+        case "premium":
+          return (
+            <Text style={$policyText}>
+              - Minimum of 10 days before requesting a claim.{"\n"}
+              - Must participate in a donation or complete the first subscription payment by the end of the month.{"\n"}
+              - Unused funds go to the shared pool if not used for P2P transactions.{"\n"}
+              - Higher priority in claims over Basic members.
+            </Text>
+          )
+        case "gold":
+          return (
+            <Text style={$policyText}>
+              - Minimum of 5 days before requesting a claim.{"\n"}
+              - Must participate in a donation or complete the first subscription payment by the end of the month.{"\n"}
+              - Unused funds go to the shared pool if not involved in P2P transactions.{"\n"}
+              - Highest priority in claims, followed by Premium, then Basic members.
+            </Text>
+          )
+        default:
+          return null
+      }
     }
 
     return (
@@ -28,7 +66,7 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
           <View
             style={[
               $subscriptionOption,
-              { backgroundColor: "#2f2f2f",  opacity: selectedPlan && selectedPlan !== "basic" ? 0.5 : 1}
+              { backgroundColor: "#2f2f2f", opacity: selectedPlan && selectedPlan !== "basic" ? 0.5 : 1 }
             ]}
           >
             <Text style={[$planName, { color: "#fff" }]}>BASIC - $200</Text>
@@ -51,23 +89,20 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
               </View>
               <View style={$buttonContainer}>
                 <Button
-                  title={selectedPlan === "basic" ? "Cancel" : i18n.t("demoCommunityScreen.viewBenefitsButton")}
-                  onPress={() => {
-                    if (selectedPlan === "basic") {
-                      handleCancelSubscription("basic")
-                    }
-                  }}
+                  title={showPolicy === "basic" ? "Hide Benefits" : i18n.t("demoCommunityScreen.viewBenefitsButton")}
+                  onPress={() => handleViewBenefits("basic")}
                   color="black"
                 />
               </View>
             </View>
+            {showPolicy === "basic" && renderPolicies("basic")}
           </View>
 
           {/* Premium Subscription */}
           <View
             style={[
               $subscriptionOption,
-              { backgroundColor: "#2ecc71", opacity: selectedPlan && selectedPlan !== "premium" ? 0.5 : 1}
+              { backgroundColor: "#2ecc71", opacity: selectedPlan && selectedPlan !== "premium" ? 0.5 : 1 }
             ]}
           >
             <Text style={[$planName, { color: "#000" }]}>PREMIUM - $300</Text>
@@ -90,23 +125,20 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
               </View>
               <View style={$buttonContainer}>
                 <Button
-                  title={selectedPlan === "premium" ? "Cancel" : i18n.t("demoCommunityScreen.viewBenefitsButton")}
-                  onPress={() => {
-                    if (selectedPlan === "premium") {
-                      handleCancelSubscription("premium")
-                    }
-                  }}
+                  title={showPolicy === "premium" ? "Hide Benefits" : i18n.t("demoCommunityScreen.viewBenefitsButton")}
+                  onPress={() => handleViewBenefits("premium")}
                   color="black"
                 />
               </View>
             </View>
+            {showPolicy === "premium" && renderPolicies("premium")}
           </View>
 
           {/* Gold Subscription */}
           <View
             style={[
               $subscriptionOption,
-              { backgroundColor: "#f39c12", opacity: selectedPlan && selectedPlan !== "gold" ? 0.5 : 1  }
+              { backgroundColor: "#f39c12", opacity: selectedPlan && selectedPlan !== "gold" ? 0.5 : 1 }
             ]}
           >
             <Text style={[$planName, { color: "#000" }]}>GOLD - $400</Text>
@@ -129,16 +161,13 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
               </View>
               <View style={$buttonContainer}>
                 <Button
-                  title={selectedPlan === "gold" ? "Cancel" : i18n.t("demoCommunityScreen.viewBenefitsButton")}
-                  onPress={() => {
-                    if (selectedPlan === "gold") {
-                      handleCancelSubscription("gold")
-                    }
-                  }}
+                  title={showPolicy === "gold" ? "Hide Benefits" : i18n.t("demoCommunityScreen.viewBenefitsButton")}
+                  onPress={() => handleViewBenefits("gold")}
                   color="black"
                 />
               </View>
             </View>
+            {showPolicy === "gold" && renderPolicies("gold")}
           </View>
         </View>
       </Screen>
@@ -216,4 +245,10 @@ const $buttonContainer: ViewStyle = {
   justifyContent: "center",
   paddingVertical: 0, // Removes any vertical padding
   paddingHorizontal: 0, // Removes any horizontal padding
+}
+// New Policy Text Style
+const $policyText: TextStyle = {
+  marginTop: spacing.md,
+  fontSize: 14,
+  color: "#555",
 }
