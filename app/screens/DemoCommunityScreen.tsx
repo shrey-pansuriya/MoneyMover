@@ -88,17 +88,9 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
                 />
               </View>
               <View style={$buttonContainer}>
-              <Button
-                  title={selectedPlan === "basic" && showPolicy ? "Hide Benefits" : selectedPlan === "basic" ? "Cancel" : i18n.t("demoCommunityScreen.viewBenefitsButton")}
-                  onPress={() => {
-                    if (selectedPlan === "basic" && !showPolicy) {
-                      handleViewBenefits("basic")
-                    } else if (selectedPlan === "basic" && showPolicy) {
-                      handleViewBenefits("basic")
-                    } else if (selectedPlan !== "basic") {
-                      handleCancelSubscription("basic")
-                    }
-                  }}
+                <Button
+                  title={showPolicy === "basic" ? "Hide Benefits" : i18n.t("demoCommunityScreen.viewBenefitsButton")}
+                  onPress={() => handleViewBenefits("basic")}
                   color="black"
                 />
               </View>
