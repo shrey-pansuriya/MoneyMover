@@ -1,5 +1,5 @@
 import React, { FC } from "react"
-import { Button, Image, TextStyle, View, ViewStyle } from "react-native"
+import { Button, TextStyle, View, ViewStyle } from "react-native"
 import { Screen, Text } from "../components"
 import { DemoTabScreenProps } from "../navigators/DemoNavigator"
 import { spacing } from "../theme"
@@ -20,32 +20,44 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
 
         <View style={$subscriptionOptionsContainer}>
           {/* Basic Subscription */}
-          <View style={[$subscriptionOption, { backgroundColor: "#f0f0f0" }]}>
+          <View style={[$subscriptionOption, { backgroundColor: "#2f2f2f" }]}>
             <Text tx="demoCommunityScreen.basicSubscriptionDescription" style={$description} />
-            <Text style={$price}>${i18n.t("demoCommunityScreen.basicSubscriptionPrice")}</Text>
-            <View style={$buttonRow}>
-              <Button title={i18n.t("demoCommunityScreen.purchaseButton")} onPress={() => handlePurchase("basic")} color="#888" />
-              <Button title={i18n.t("demoCommunityScreen.viewBenefitsButton")} onPress={() => handleViewBenefits("basic")} color="#888" />
+            <Text style={[$price, { color: "#fff" }]}>${i18n.t("demoCommunityScreen.basicSubscriptionPrice")}</Text>
+            <View style={$buttonWrapper}>
+              <View style={$buttonContainer}>
+                <Button title={i18n.t("demoCommunityScreen.purchaseButton")} onPress={() => handlePurchase("basic")} color="black" />
+              </View>
+              <View style={$buttonContainer}>
+                <Button title={i18n.t("demoCommunityScreen.viewBenefitsButton")} onPress={() => handleViewBenefits("basic")} color="black" />
+              </View>
             </View>
           </View>
 
           {/* Premium Subscription */}
           <View style={[$subscriptionOption, { backgroundColor: "#2ecc71" }]}>
             <Text tx="demoCommunityScreen.premiumSubscriptionDescription" style={$description} />
-            <Text style={$price}>${i18n.t("demoCommunityScreen.premiumSubscriptionPrice")}</Text>
-            <View style={$buttonRow}>
-              <Button title={i18n.t("demoCommunityScreen.purchaseButton")} onPress={() => handlePurchase("premium")} color="#fff" />
-              <Button title={i18n.t("demoCommunityScreen.viewBenefitsButton")} onPress={() => handleViewBenefits("premium")} color="#fff" />
+            <Text style={[$price, { color: "#000" }]}>${i18n.t("demoCommunityScreen.premiumSubscriptionPrice")}</Text>
+            <View style={$buttonWrapper}>
+              <View style={$buttonContainer}>
+                <Button title={i18n.t("demoCommunityScreen.purchaseButton")} onPress={() => handlePurchase("premium")} color="black" />
+              </View>
+              <View style={$buttonContainer}>
+                <Button title={i18n.t("demoCommunityScreen.viewBenefitsButton")} onPress={() => handleViewBenefits("premium")} color="black" />
+              </View>
             </View>
           </View>
 
           {/* Gold Subscription */}
           <View style={[$subscriptionOption, { backgroundColor: "#f39c12" }]}>
             <Text tx="demoCommunityScreen.goldSubscriptionDescription" style={$description} />
-            <Text style={$price}>${i18n.t("demoCommunityScreen.goldSubscriptionPrice")}</Text>
-            <View style={$buttonRow}>
-              <Button title={i18n.t("demoCommunityScreen.purchaseButton")} onPress={() => handlePurchase("gold")} color="#fff" />
-              <Button title={i18n.t("demoCommunityScreen.viewBenefitsButton")} onPress={() => handleViewBenefits("gold")} color="#fff" />
+            <Text style={[$price, { color: "#000" }]}>${i18n.t("demoCommunityScreen.goldSubscriptionPrice")}</Text>
+            <View style={$buttonWrapper}>
+              <View style={$buttonContainer}>
+                <Button title={i18n.t("demoCommunityScreen.purchaseButton")} onPress={() => handlePurchase("gold")} color="black" />
+              </View>
+              <View style={$buttonContainer}>
+                <Button title={i18n.t("demoCommunityScreen.viewBenefitsButton")} onPress={() => handleViewBenefits("gold")} color="black" />
+              </View>
             </View>
           </View>
         </View>
@@ -107,12 +119,20 @@ const $price: TextStyle = {
   fontSize: 18,
   fontWeight: "bold",
   marginTop: spacing.sm,
-  color: "#fff",
 }
 
-const $buttonRow: ViewStyle = {
+const $buttonWrapper: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-between",
   marginTop: spacing.lg,
+}
+
+const $buttonContainer: ViewStyle = {
+  backgroundColor: "#fff",
+  borderRadius: 5,
+  overflow: "hidden",
+  flex: 1,
+  marginHorizontal: 5,
+  justifyContent: "center",
 }
 
