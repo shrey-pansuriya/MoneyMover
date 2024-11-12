@@ -102,9 +102,10 @@ const $tagline: TextStyle = {
 }
 
 const $planName: TextStyle = {
-  fontSize: 36, // Large text for plan name
+  fontSize: 48, // Significantly larger text for plan name
   fontWeight: "bold",
   marginBottom: spacing.sm,
+  lineHeight: 55, // Increased line height to prevent cutting off
 }
 
 const $description: TextStyle = {
@@ -124,7 +125,7 @@ const $subscriptionOption: ViewStyle = {
   shadowOffset: { width: 0, height: 2 },
   shadowOpacity: 0.1,
   shadowRadius: 5,
-  minHeight: 200, // Ensures there's enough height for large text
+  minHeight: 250, // Increased minimum height to accommodate larger text
 }
 
 const $buttonWrapper: ViewStyle = {
