@@ -28,7 +28,7 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
           <View
             style={[
               $subscriptionOption,
-              { backgroundColor: "#2f2f2f", opacity: selectedPlan === "basic" ? 1 : 0.5 }
+              { backgroundColor: "#2f2f2f", opacity: selectedPlan === "basic" ? 0.5 : 1 }
             ]}
           >
             <Text style={[$planName, { color: "#fff" }]}>BASIC - $200</Text>
@@ -67,7 +67,7 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
           <View
             style={[
               $subscriptionOption,
-              { backgroundColor: "#2ecc71", opacity: selectedPlan === "premium" ? 1 : 0.5 }
+              { backgroundColor: "#2ecc71", opacity: selectedPlan === "premium" ? 0.5 : 1 }
             ]}
           >
             <Text style={[$planName, { color: "#000" }]}>PREMIUM - $300</Text>
@@ -106,7 +106,7 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
           <View
             style={[
               $subscriptionOption,
-              { backgroundColor: "#f39c12", opacity: selectedPlan === "gold" ? 1 : 0.5 }
+              { backgroundColor: "#f39c12", opacity: selectedPlan === "gold" ? 0.5 : 1 }
             ]}
           >
             <Text style={[$planName, { color: "#000" }]}>GOLD - $400</Text>
@@ -214,4 +214,6 @@ const $buttonContainer: ViewStyle = {
   flex: 1,
   marginHorizontal: 5,
   justifyContent: "center",
+  paddingVertical: 0, // Removes any vertical padding
+  paddingHorizontal: 0, // Removes any horizontal padding
 }
