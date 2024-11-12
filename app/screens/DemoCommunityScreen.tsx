@@ -64,52 +64,39 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
         <View style={$subscriptionOptionsContainer}>
           {/* Basic Subscription */}
           <View
-  style={[
-    $subscriptionOption,
-    { backgroundColor: "#2f2f2f", opacity: selectedPlan && selectedPlan !== "basic" ? 0.5 : 1 }
-  ]}
->
-  <Text style={[$planName, { color: "#fff" }]}>BASIC - $200</Text>
-  <Text style={[$description, { color: "#fff" }]}>
-    {i18n.t("demoCommunityScreen.basicSubscriptionDescription")}
-  </Text>
-  <View style={$buttonWrapper}>
-    <View style={$buttonContainer}>
-      <Button
-        title={selectedPlan === "basic" ? "Active" : i18n.t("demoCommunityScreen.purchaseButton")}
-        onPress={() => {
-          if (selectedPlan === "basic") {
-            handleCancelSubscription("basic")
-          } else {
-            handleSelectPlan("basic")
-          }
-        }}
-        color="black"
-      />
-    </View>
-    <View style={$buttonContainer}>
-      <Button
-        title={selectedPlan === "basic" ? "Cancel" : i18n.t("demoCommunityScreen.viewBenefitsButton")}
-        onPress={() => {
-          if (selectedPlan === "basic") {
-            handleCancelSubscription("basic")
-          } else {
-            handleViewBenefits("basic")
-          }
-        }}
-        color="black"
-      />
-    </View>
-    <View style={$buttonContainer}>
-      <Button
-        title={showPolicy === "basic" ? "Hide Benefits" : i18n.t("demoCommunityScreen.viewBenefitsButton")}
-        onPress={() => handleViewBenefits("basic")}
-        color="black"
-      />
-    </View>
-  </View>
-  {showPolicy === "basic" && renderPolicies("basic")}
-</View>
+            style={[
+              $subscriptionOption,
+              { backgroundColor: "#2f2f2f", opacity: selectedPlan && selectedPlan !== "basic" ? 0.5 : 1 }
+            ]}
+          >
+            <Text style={[$planName, { color: "#fff" }]}>BASIC - $200</Text>
+            <Text style={[$description, { color: "#fff" }]}>
+              {i18n.t("demoCommunityScreen.basicSubscriptionDescription")}
+            </Text>
+            <View style={$buttonWrapper}>
+              <View style={$buttonContainer}>
+                <Button
+                  title={selectedPlan === "basic" ? "Active" : i18n.t("demoCommunityScreen.purchaseButton")}
+                  onPress={() => {
+                    if (selectedPlan === "basic") {
+                      handleCancelSubscription("basic")
+                    } else {
+                      handleSelectPlan("basic")
+                    }
+                  }}
+                  color="black"
+                />
+              </View>
+              <View style={$buttonContainer}>
+                <Button
+                  title={showPolicy === "basic" ? "Hide Benefits" : i18n.t("demoCommunityScreen.viewBenefitsButton")}
+                  onPress={() => handleViewBenefits("basic")}
+                  color="black"
+                />
+              </View>
+            </View>
+            {showPolicy === "basic" && renderPolicies("basic")}
+          </View>
 
           {/* Premium Subscription */}
           <View
