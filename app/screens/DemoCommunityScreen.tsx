@@ -21,8 +21,10 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
         <View style={$subscriptionOptionsContainer}>
           {/* Basic Subscription */}
           <View style={[$subscriptionOption, { backgroundColor: "#2f2f2f" }]}>
-            <Text tx="demoCommunityScreen.basicSubscriptionDescription" style={$description} />
-            <Text style={[$price, { color: "#fff" }]}>${i18n.t("demoCommunityScreen.basicSubscriptionPrice")}</Text>
+            <Text style={[$planName, { color: "#fff" }]}>BASIC - $200</Text>
+            <Text style={[$description, { color: "#fff" }]}>
+              {i18n.t("demoCommunityScreen.basicSubscriptionDescription")}
+            </Text>
             <View style={$buttonWrapper}>
               <View style={$buttonContainer}>
                 <Button title={i18n.t("demoCommunityScreen.purchaseButton")} onPress={() => handlePurchase("basic")} color="black" />
@@ -35,8 +37,10 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
 
           {/* Premium Subscription */}
           <View style={[$subscriptionOption, { backgroundColor: "#2ecc71" }]}>
-            <Text tx="demoCommunityScreen.premiumSubscriptionDescription" style={$description} />
-            <Text style={[$price, { color: "#000" }]}>${i18n.t("demoCommunityScreen.premiumSubscriptionPrice")}</Text>
+            <Text style={[$planName, { color: "#000" }]}>PREMIUM - $300</Text>
+            <Text style={$description}>
+              {i18n.t("demoCommunityScreen.premiumSubscriptionDescription")}
+            </Text>
             <View style={$buttonWrapper}>
               <View style={$buttonContainer}>
                 <Button title={i18n.t("demoCommunityScreen.purchaseButton")} onPress={() => handlePurchase("premium")} color="black" />
@@ -49,8 +53,10 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
 
           {/* Gold Subscription */}
           <View style={[$subscriptionOption, { backgroundColor: "#f39c12" }]}>
-            <Text tx="demoCommunityScreen.goldSubscriptionDescription" style={$description} />
-            <Text style={[$price, { color: "#000" }]}>${i18n.t("demoCommunityScreen.goldSubscriptionPrice")}</Text>
+            <Text style={[$planName, { color: "#000" }]}>GOLD - $400</Text>
+            <Text style={$description}>
+              {i18n.t("demoCommunityScreen.goldSubscriptionDescription")}
+            </Text>
             <View style={$buttonWrapper}>
               <View style={$buttonContainer}>
                 <Button title={i18n.t("demoCommunityScreen.purchaseButton")} onPress={() => handlePurchase("gold")} color="black" />
@@ -95,10 +101,15 @@ const $tagline: TextStyle = {
   color: "#666",
 }
 
+const $planName: TextStyle = {
+  fontSize: 36, // Large text for plan name
+  fontWeight: "bold",
+  marginBottom: spacing.sm,
+}
+
 const $description: TextStyle = {
   marginBottom: spacing.sm,
   fontSize: 16,
-  color: "#333",
 }
 
 const $subscriptionOptionsContainer: ViewStyle = {
@@ -115,12 +126,6 @@ const $subscriptionOption: ViewStyle = {
   shadowRadius: 5,
 }
 
-const $price: TextStyle = {
-  fontSize: 18,
-  fontWeight: "bold",
-  marginTop: spacing.sm,
-}
-
 const $buttonWrapper: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-between",
@@ -135,4 +140,3 @@ const $buttonContainer: ViewStyle = {
   marginHorizontal: 5,
   justifyContent: "center",
 }
-
