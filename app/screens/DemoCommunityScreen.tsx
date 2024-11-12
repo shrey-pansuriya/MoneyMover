@@ -250,5 +250,5 @@ const $buttonContainer: ViewStyle = {
 const $policyText: TextStyle = {
   marginTop: spacing.md,
   fontSize: 14,
-  color: "#555",
+  color: "#fff",
 }
