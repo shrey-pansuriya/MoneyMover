@@ -34,7 +34,7 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
           <View
             style={[
               $subscriptionOption,
-              { backgroundColor: "#2f2f2f", opacity: selectedPlan === "basic" ? 1 : 0.5 } // Reduce opacity for other plans
+              { backgroundColor: "#2f2f2f", opacity: selectedPlan === "basic" ? 1 : 0.5 } // Default opacity is 100%, change only when selected
             ]}
           >
             <Text style={[$planName, { color: "#fff" }]}>BASIC - $200</Text>
@@ -71,7 +71,7 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
           <View
             style={[
               $subscriptionOption,
-              { backgroundColor: "#2ecc71", opacity: selectedPlan === "premium" ? 1 : 0.5 } // Reduce opacity for other plans
+              { backgroundColor: "#2ecc71", opacity: selectedPlan === "premium" ? 1 : 0.5 } // Default opacity is 100%, change only when selected
             ]}
           >
             <Text style={[$planName, { color: "#000" }]}>PREMIUM - $300</Text>
@@ -108,7 +108,7 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
           <View
             style={[
               $subscriptionOption,
-              { backgroundColor: "#f39c12", opacity: selectedPlan === "gold" ? 1 : 0.5 } // Reduce opacity for other plans
+              { backgroundColor: "#f39c12", opacity: selectedPlan === "gold" ? 1 : 0.5 } // Default opacity is 100%, change only when selected
             ]}
           >
             <Text style={[$planName, { color: "#000" }]}>GOLD - $400</Text>
