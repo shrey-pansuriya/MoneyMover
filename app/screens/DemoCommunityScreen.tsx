@@ -204,8 +204,7 @@ const $subscriptionOption: ViewStyle = {
 const $buttonWrapper: ViewStyle = {
   flexDirection: "row",
   justifyContent: "space-between",
-  marginTop: 0,                  // Ensure there's no margin at the top
-  padding: 0, 
+  marginTop: spacing.lg,
 }
 
 const $buttonContainer: ViewStyle = {
@@ -213,7 +212,7 @@ const $buttonContainer: ViewStyle = {
   borderRadius: 5,
   overflow: "hidden",
   flex: 1,
-  marginHorizontal: 0,
+  marginHorizontal: 5,
   justifyContent: "center",
   paddingVertical: 0, // Removes any vertical padding
   paddingHorizontal: 0, // Removes any horizontal padding
