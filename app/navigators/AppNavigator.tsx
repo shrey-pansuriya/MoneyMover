@@ -35,10 +35,10 @@ import { colors } from "app/theme"
  *   https://reactnavigation.org/docs/typescript/#organizing-types
  */
 export type AppStackParamList = {
-  Welcome: undefined
+  Welcome: { userId: number }
   Login: undefined
   AdditionalInfo: undefined;
-  Demo: NavigatorScreenParams<DemoTabParamList>
+  Demo: { userId: number } | NavigatorScreenParams<DemoTabParamList>;
   // 🔥 Your screens go here
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }

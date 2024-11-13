@@ -11,6 +11,12 @@ import { useSafeAreaInsetsStyle } from "../../utils/useSafeAreaInsetsStyle"
 import * as Demos from "./demos"
 import { DrawerIconButton } from "./DrawerIconButton"
 
+const route = useRoute<RouteProp<DemoTabParamList, "DemoShowroom">>();
+const { userId } = route.params; // Access userId from route params
+
+  // Now you can use userId inside the component
+  console.log("User ID in DemoShowroom:", userId);
+  
 const logo = require("../../../assets/images/logo.png")
 
 export interface Demo {

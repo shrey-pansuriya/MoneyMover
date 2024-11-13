@@ -15,13 +15,19 @@ const welcomeFace = require("../../assets/images/welcome-face.png")
 interface WelcomeScreenProps extends AppStackScreenProps<"Welcome"> {}
 
 export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeScreen(_props) {
-  const { navigation } = _props
+  const { navigation, route } = _props;
+  const { userId } = route.params; // Get userId from route params
+
   const {
     authenticationStore: { logout },
   } = useStores()
 
   function goNext() {
-    navigation.navigate("Demo", { screen: "DemoShowroom", params: {} })
+    // Navigate to Demo screen, passing userId, and specify the nested screen DemoShowroom
+    navigation.navigate("Demo", {
+      screen: "DemoShowroom",  // Navigate to the DemoShowroom screen
+      params: { userId: userId },  // Pass userId as params for DemoShowroom
+    });
   }
 
   useHeader(

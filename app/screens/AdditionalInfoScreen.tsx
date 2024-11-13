@@ -49,28 +49,34 @@ export const AdditionalInfoScreen: FC<AdditionalInfoScreenProps> = observer(func
   }
 
   const handleSubmit = () => {
-    setIsSubmitted(true)
-
+    setIsSubmitted(true);
+  
     // Validate inputs before submitting
     if (!validateInput()) {
-        return; // Exit if validation fails
-      }
-
+      return; // Exit if validation fails
+    }
+  
     // Handle submission logic, e.g., validation or saving data to state/store
     if (!firstName || !lastName || !age || !address || !phone) {
       // Display an error message or handle the error
-      return
+      return;
     }
-    
-    // Insert the user info into the SQLite database
-    insertUserInfo(firstName, lastName, parseInt(age), address, phone);
-
+  
+    // Insert the user info into the SQLite database and get the userId
+    insertUserInfo(firstName, lastName, parseInt(age), address, phone, (userId) => {
+      if (userId !== null) {
+        // Once the userId is retrieved from the database, navigate to the Welcome screen
+        _props.navigation.navigate("Welcome", { userId }); // Pass userId to the Welcome screen
+      } else {
+        console.error("Failed to retrieve userId");
+        // Handle the case where userId is null (error in insertion)
+      }
+    });
+  
     // Mock submission - you can replace this with actual API call or state update
-    console.log({ firstName, lastName, age, address, phone })
-
-    // Navigate to the Welcome screen after successful submission
-    _props.navigation.navigate("Welcome")
-  }
+    console.log({ firstName, lastName, age, address, phone });
+  };
+  
 
   return (
     <Screen

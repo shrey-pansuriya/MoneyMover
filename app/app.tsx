@@ -17,8 +17,8 @@ if (__DEV__) {
   require("./devtools/ReactotronConfig.ts")
 }
 
-import { createTable } from "app/utils/database"; // Adjust the import based on your file structure
-
+import { initializeDatabase } from "app/utils/database"; // Default import
+import { useEffect } from 'react';
 import "./utils/gestureHandler"
 import "./i18n"
 import "./utils/ignoreWarnings"
@@ -75,18 +75,24 @@ function App(props: AppProps) {
 
   const [areFontsLoaded, fontLoadError] = useFonts(customFontsToLoad)
 
-  const { rehydrated } = useInitialRootStore(() => {
-    // This runs after the root store has been initialized and rehydrated.
+  // Initialize the root store and database tables
+  const { rehydrated } = useInitialRootStore(async () => {
+    try {
+      // Await database initialization
+      await initializeDatabase();
+      console.log("Database initialized successfully");
+    } catch (error) {
+      console.error("Error initializing database:", error);
+    }
+  });
 
-    // Create the database tables
-    createTable();    
-
-    // If your initialization scripts run very fast, it's good to show the splash screen for just a bit longer to prevent flicker.
-    // Slightly delaying splash screen hiding for better UX; can be customized or removed as needed,
-    // Note: (vanilla Android) The splash-screen will not appear if you launch your app via the terminal or Android Studio. Kill the app and launch it normally by tapping on the launcher icon. https://stackoverflow.com/a/69831106
-    // Note: (vanilla iOS) You might notice the splash-screen logo change size. This happens in debug/development mode. Try building the app for release.
-    setTimeout(hideSplashScreen, 500)
-  })
+  // Hide the splash screen after initialization is complete
+  useEffect(() => {
+    if (rehydrated && areFontsLoaded && isNavigationStateRestored) {
+      // Adding a slight delay before hiding the splash screen
+      setTimeout(hideSplashScreen, 500);
+    }
+  }, [rehydrated, areFontsLoaded, isNavigationStateRestored]);
 
   // Before we show the app, we have to wait for our state to be ready.
   // In the meantime, don't render anything. This will be the background

@@ -11,11 +11,11 @@ import { colors, spacing, typography } from "../theme"
 import { AppStackParamList, AppStackScreenProps } from "./AppNavigator"
 
 export type DemoTabParamList = {
-  DemoCommunity: undefined
-  DemoShowroom: { queryIndex?: string; itemIndex?: string }
-  Settings: undefined
-  DemoPodcastList: undefined
-}
+  DemoCommunity: { userId: number }; // userId for DemoCommunity
+  DemoShowroom: { userId: number; queryIndex?: string; itemIndex?: string }; // userId for DemoShowroom as well
+  Settings: undefined;
+  DemoPodcastList: undefined;
+};
 
 /**
  * Helper for automatically generating navigation prop types for each route.

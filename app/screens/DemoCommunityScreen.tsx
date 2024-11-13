@@ -1,23 +1,53 @@
-import React, { FC, useState } from "react"
+import React, { createContext, useContext, FC, useState } from "react"
 import { Button, TextStyle, View, ViewStyle } from "react-native"
 import { Screen, Text } from "../components"
 import { DemoTabScreenProps } from "../navigators/DemoNavigator"
 import { spacing } from "../theme"
 import { i18n } from "../i18n"
+import { insertUserSubscription, updateUserSubscription, insertUserInfo } from '../utils/database';
+import { useRoute } from "@react-navigation/native"; 
+import { RouteProp } from "@react-navigation/native";
+import { DemoTabParamList } from "../navigators/DemoNavigator"; // Import the correct type
+
 
 export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
   function DemoCommunityScreen(_props) {
     const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
     const [showPolicy, setShowPolicy] = useState<string | null>(null)
+    const route = useRoute<RouteProp<DemoTabParamList, "DemoCommunity">>(); // Access route.params
+    const { userId } = route.params; // Now we can access userId
+  
+    // Use userId here
+    console.log("User ID in DemoCommunity:", userId);
+// Handle Plan Selection (just selecting the plan, no purchase yet)
+const handleSelectPlan = (plan: string) => {
+  setSelectedPlan(plan); // Update state to reflect the selected plan
+  // No need to call setClaimPriority, as it will be handled during purchase
+};
+    
+// Handle Subscription Purchase
+const handlePurchaseSubscription = (plan: string, amount: number, priority: number) => {
+  const purchaseDate = new Date().toISOString().split('T')[0]; // Format as YYYY-MM-DD
 
-    const handleSelectPlan = (plan: string) => {
-      setSelectedPlan(plan)
-    }
+      // Update the database with the selected plan and purchase details
+      insertUserSubscription(userId, plan, amount, true, purchaseDate, priority);
 
+      // Set the plan as selected and active
+      setSelectedPlan(plan);
+      setShowPolicy(plan); // Show benefits for the selected plan
+    };
+
+
+    // Handle Subscription Cancellation
     const handleCancelSubscription = (plan: string) => {
-      setSelectedPlan(null)
       console.log(`Cancelled subscription for ${plan} plan`)
-    }
+      // Update the database to deactivate the subscription
+      updateUserSubscription(userId, plan, 0, false, "", 0); // Set as inactive and clear the purchase date and priority
+      
+      // Reset selected plan and claim priority
+      setSelectedPlan(null);
+      setShowPolicy(""); // Hide benefits when the subscription is canceled
+    };
 
     const handleViewBenefits = (plan: string) => {
       setShowPolicy(showPolicy === plan ? null : plan)
@@ -79,7 +109,8 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
                   title={selectedPlan === "basic" ? "Active" : i18n.t("demoCommunityScreen.purchaseButton")}
                   onPress={() => {
                     if (selectedPlan === "basic") {
-                      handleCancelSubscription("basic")
+                      handleCancelSubscription("basic");
+                      handlePurchaseSubscription("basic", 200, 3); // Then, purchase the plan
                     } else {
                       handleSelectPlan("basic")
                     }
@@ -117,7 +148,8 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
                     if (selectedPlan === "premium") {
                       handleCancelSubscription("premium")
                     } else {
-                      handleSelectPlan("premium")
+                      handleSelectPlan("premium");
+                      handlePurchaseSubscription("premium", 300, 2); // Then, purchase the plan
                     }
                   }}
                   color="black"
@@ -151,7 +183,9 @@ export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
                   title={selectedPlan === "gold" ? "Active" : i18n.t("demoCommunityScreen.purchaseButton")}
                   onPress={() => {
                     if (selectedPlan === "gold") {
-                      handleCancelSubscription("gold")
+                      handleCancelSubscription("gold");
+                      handlePurchaseSubscription("gold", 400, 1); // Then, purchase the plan
+
                     } else {
                       handleSelectPlan("gold")
                     }
