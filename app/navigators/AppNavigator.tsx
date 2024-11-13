@@ -60,7 +60,9 @@ const Stack = createNativeStackNavigator<AppStackParamList>()
 const AppStack = observer(function AppStack() {
   const {
     authenticationStore: { isAuthenticated },
+    
   } = useStores()
+  console.log("Is authenticated:", isAuthenticated);  // Debug this value
 
   return (
     <Stack.Navigator

@@ -54,7 +54,6 @@ export function DemoNavigator() {
       <Tab.Screen
         name="DemoShowroom"
         component={DemoShowroomScreen}
-        initialParams={{ userId: 123 }} // Pass userId to the screen if needed
         options={{
           tabBarLabel: translate("demoNavigator.componentsTab"),
           tabBarIcon: ({ focused }) => (
