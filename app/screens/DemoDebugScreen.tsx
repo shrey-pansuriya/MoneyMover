@@ -1,6 +1,6 @@
 import React, { FC, useState } from "react"
 import * as Application from "expo-application"
-import { Modal, View, ViewStyle, TextStyle, TouchableOpacity } from "react-native"
+import { Modal, View, ViewStyle, TextStyle, TouchableOpacity, TextInput } from "react-native"
 import { Button, ListItem, Screen, Text } from "../components"
 import { DemoTabScreenProps } from "../navigators/DemoNavigator"
 import { colors, spacing } from "../theme"
@@ -32,6 +32,71 @@ const ContactInfoModal: FC<{ visible: boolean; onClose: () => void }> = ({ visib
   </Modal>
 );
 
+/**
+ * Component for editing the user's profile information.
+ */
+const ChangeProfileInfoModal: FC<{ visible: boolean; onClose: () => void }> = ({ visible, onClose }) => {
+  const [firstName, setFirstName] = useState("")
+  const [lastName, setLastName] = useState("")
+  const [age, setAge] = useState("")
+  const [address, setAddress] = useState("")
+  const [phone, setPhone] = useState("")
+
+  const handleSaveChanges = () => {
+    // You can call the insertUserInfo or updateUserInfo function here to save the changes
+    console.log("Saving changes:", { firstName, lastName, age, address, phone })
+    onClose() // Close modal after saving
+  }
+
+  return (
+    <Modal transparent={true} visible={visible} animationType="slide">
+      <View style={modalStyles.container}>
+        <View style={modalStyles.innerContainer}>
+          <Text style={modalStyles.title}>Change Profile Info</Text>
+          <TextInput
+            style={modalStyles.input}
+            value={firstName}
+            onChangeText={setFirstName}
+            placeholder="First Name"
+          />
+          <TextInput
+            style={modalStyles.input}
+            value={lastName}
+            onChangeText={setLastName}
+            placeholder="Last Name"
+          />
+          <TextInput
+            style={modalStyles.input}
+            value={age}
+            onChangeText={setAge}
+            placeholder="Age"
+            keyboardType="numeric"
+          />
+          <TextInput
+            style={modalStyles.input}
+            value={address}
+            onChangeText={setAddress}
+            placeholder="Address"
+          />
+          <TextInput
+            style={modalStyles.input}
+            value={phone}
+            onChangeText={setPhone}
+            placeholder="Phone"
+            keyboardType="phone-pad"
+          />
+          <Button style={modalStyles.button} onPress={handleSaveChanges}>
+            <Text style={modalStyles.buttonText}>Save Changes</Text>
+          </Button>
+          <Button style={modalStyles.button} onPress={onClose}>
+            <Text style={modalStyles.buttonText}>Cancel</Text>
+          </Button>
+        </View>
+      </View>
+    </Modal>
+  )
+};
+
 export const DemoDebugScreen: FC<DemoTabScreenProps<"Settings">> = function DemoDebugScreen(
   _props,
 ) {
@@ -39,7 +104,8 @@ export const DemoDebugScreen: FC<DemoTabScreenProps<"Settings">> = function Demo
     authenticationStore: { logout },
   } = useStores()
 
-  const [modalVisible, setModalVisible] = useState(false)
+  const [contactModalVisible, setContactModalVisible] = useState(false)
+  const [profileModalVisible, setProfileModalVisible] = useState(false) // Declare setProfileModalVisible state
 
   return (
     <Screen preset="scroll" safeAreaEdges={["top"]} contentContainerStyle={$container}>
@@ -80,12 +146,12 @@ export const DemoDebugScreen: FC<DemoTabScreenProps<"Settings">> = function Demo
       </View>
       {/* New Change Profile Info Button above Contact Us */}
       <View style={$buttonContainer}>
-      <Button style={$button} onPress={() => { /* No action for now */ }}>
+        <Button style={$button} onPress={() => setProfileModalVisible(true)}>
           Change Profile Info
         </Button>
       </View>
       <View style={$buttonContainer}>
-        <Button style={$button} onPress={() => setModalVisible(true)}>
+        <Button style={$button} onPress={() => setContactModalVisible(true)}>
           Contact Us
         </Button>
       </View>
@@ -93,7 +159,8 @@ export const DemoDebugScreen: FC<DemoTabScreenProps<"Settings">> = function Demo
         <Button style={$button} tx="common.logOut" onPress={logout} />
       </View>
 
-      <ContactInfoModal visible={modalVisible} onClose={() => setModalVisible(false)} />
+      <ContactInfoModal visible={contactModalVisible} onClose={() => setContactModalVisible(false)} />
+      <ChangeProfileInfoModal visible={profileModalVisible} onClose={() => setProfileModalVisible(false)} />
     </Screen>
   )
 }
@@ -131,6 +198,14 @@ const modalStyles = {
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
   } as ViewStyle,
+  input: {
+    height: 40,
+    borderColor: "#ddd",
+    borderWidth: 1,
+    marginBottom: spacing.sm,
+    paddingHorizontal: 8,
+    width: '100%',
+  } as TextStyle,
   innerContainer: {
     width: '80%',
     padding: spacing.lg,
