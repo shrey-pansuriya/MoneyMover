@@ -17,7 +17,7 @@ if (__DEV__) {
   require("./devtools/ReactotronConfig.ts")
 }
 
-import { createTable } from "app/utils/database"; // Adjust the import based on your file structure
+import { initializeDatabase, populateDatabaseForSimulation } from "app/utils/database"; 
 import { simulateClaimsProcess } from "app/utils/claimprocessing"; // Adjust the import based on your file structure
 
 import "./utils/gestureHandler"
@@ -79,11 +79,24 @@ function App(props: AppProps) {
   const { rehydrated } = useInitialRootStore(() => {
     // This runs after the root store has been initialized and rehydrated.
 
-    // Create the database tables
-    createTable();    
+    // Step 1: Initialize the database and create tables
+    initializeDatabase()
+      .then(() => {
+        console.log("Database initialized successfully");
 
-    console.log("Starting Claims Processor Simulation...");
-    simulateClaimsProcess();
+        // Step 2: Populate the database with test data for simulation
+        return populateDatabaseForSimulation();
+      })
+      .then(() => {
+        console.log("Database populated with test data");
+
+        // Step 3: Start the Claims Processor Simulation
+        console.log("Starting Claims Processor Simulation...");
+        simulateClaimsProcess(); // Run the claims processing simulation after the database is populated
+      })
+      .catch((error) => {
+        console.error("Error during database initialization or population:", error);
+      });
 
     // If your initialization scripts run very fast, it's good to show the splash screen for just a bit longer to prevent flicker.
     // Slightly delaying splash screen hiding for better UX; can be customized or removed as needed,

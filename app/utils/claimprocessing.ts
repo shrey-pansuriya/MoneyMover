@@ -1,3 +1,5 @@
+import { fetchPendingClaims, fetchUserSubscription, fetchFundingDetails, fetchActiveUsers } from "app/utils/database"; // Add necessary imports for database queries
+
 type User = {
     id: number;
     balance: number;
@@ -5,9 +7,8 @@ type User = {
     transactions: number;
   };
   
+  // Distribute claims based on the logic provided
   function distributeClaims(users: User[], sharedFund: { value: number }) {
-   // let totalMoneyInSystem = users.reduce((sum, user) => sum + user.balance, sharedFund.value);
-  
     // Step 1: Self-payment of claims
     users.forEach((claimant) => {
       if (claimant.claims > 0) {
@@ -42,50 +43,38 @@ type User = {
     });
   
     // Step 3: Cover remaining claims using the shared fund
-users.forEach((claimant) => {
-    if (claimant.claims > 0) {
-      let remainingClaim = claimant.claims;
+    users.forEach((claimant) => {
+      if (claimant.claims > 0) {
+        let remainingClaim = claimant.claims;
   
-      if (remainingClaim > 0 && sharedFund.value > 0) {
-        if (sharedFund.value < remainingClaim) {
-          // If using the shared fund would deplete it, pay only 50% of the claim
-          const fromFund = sharedFund.value * 0.5; // Only pay 50% of the remaining claim
-          sharedFund.value -= fromFund;
-          claimant.claims -= fromFund;
-          remainingClaim -= fromFund;
+        if (remainingClaim > 0 && sharedFund.value > 0) {
+          if (sharedFund.value < remainingClaim) {
+            // If using the shared fund would deplete it, pay only 50% of the claim
+            const fromFund = sharedFund.value * 0.5; // Only pay 50% of the remaining claim
+            sharedFund.value -= fromFund;
+            claimant.claims -= fromFund;
+            remainingClaim -= fromFund;
   
-          console.log(
-            `Shared fund pays $${fromFund.toFixed(2)} to User ${claimant.id}.`
-          );
+            console.log(`Shared fund pays $${fromFund.toFixed(2)} to User ${claimant.id}.`);
   
-          // Inform user about the remaining amount
-          console.log(
-            `User ${claimant.id} must pay the remaining $${remainingClaim.toFixed(
-              2
-            )} using their own balance.`
-          );
-        } else {
-          // If the shared fund can cover the remaining claim
-          const fromFund = Math.min(remainingClaim, sharedFund.value);
-          sharedFund.value -= fromFund;
-          claimant.claims -= fromFund;
-          remainingClaim -= fromFund;
+            // Inform user about the remaining amount
+            console.log(`User ${claimant.id} must pay the remaining $${remainingClaim.toFixed(2)} using their own balance.`);
+          } else {
+            // If the shared fund can cover the remaining claim
+            const fromFund = Math.min(remainingClaim, sharedFund.value);
+            sharedFund.value -= fromFund;
+            claimant.claims -= fromFund;
+            remainingClaim -= fromFund;
   
-          console.log(
-            `Shared fund pays $${fromFund.toFixed(2)} to User ${claimant.id}.`
-          );
-        }
+            console.log(`Shared fund pays $${fromFund.toFixed(2)} to User ${claimant.id}.`);
+          }
   
-        if (remainingClaim > 0) {
-          console.log(
-            `User ${claimant.id} still has $${remainingClaim.toFixed(
-              2
-            )} in unpaid claims.`
-          );
+          if (remainingClaim > 0) {
+            console.log(`User ${claimant.id} still has $${remainingClaim.toFixed(2)} in unpaid claims.`);
+          }
         }
       }
-    }
-  });
+    });
   
     // Step 4: Move remaining balances to the shared fund
     users.forEach((user) => {
@@ -103,6 +92,7 @@ users.forEach((claimant) => {
     console.log(`Operational cost of $${operationalCost.toFixed(2)} deducted from the shared fund.`);
   }
   
+  // Reset user claims and transactions for the next month
   function resetForNextMonth(users: User[]) {
     users.forEach((user) => {
       user.claims = 0;
@@ -110,36 +100,65 @@ users.forEach((claimant) => {
     });
   }
   
-  export function simulateClaimsProcess() {
-    const numUsers = 5;
-    const monthlyContribution = 200.0;
-    const sharedFund = { value: 1000.0 };
-    const users: User[] = Array.from({ length: numUsers }, (_, i) => ({
-      id: i,
-      balance: 0,
-      claims: 0,
-      transactions: 0,
-    }));
+  export async function simulateClaimsProcess() {
+    const totalMonths = 1; // For testing, we'll simulate only one month
   
-    const totalMonths = 30;
     for (let month = 1; month <= totalMonths; month++) {
       console.log(`\n=================================\nStart month ${month}`);
   
-      // Monthly claims
-      users.forEach((user) => {
-        if (Math.random() < 0.5) { // 50% chance of submitting a claim
-          user.claims = Math.floor(Math.random() * 300) + 200;
-          console.log(`User ${user.id} submitted a claim of $${user.claims.toFixed(2)}`);
-        }
-        user.balance += monthlyContribution;
-      });
+      // Fetch the pending claims list to determine users who have submitted claims
+      const claimsList = await fetchPendingClaims();
+      const usersInClaims: User[] = [];
   
-      // Run the algorithm
-      distributeClaims(users, sharedFund);
+      // Fetch user subscription details for users in the claims list
+      for (const claim of claimsList) {
+        const userSubscription = await fetchUserSubscription(claim.user_id);
+        if (userSubscription.length > 0) {
+          const user = {
+            id: claim.user_id,
+            balance: userSubscription[0].balance, // Assuming subscription data has balance
+            claims: claim.claim_amount,
+            transactions: 0,
+          };
+          usersInClaims.push(user);
+        }
+      }
+  
+      // Fetch the active users whose subscriptions are active (whose balance can be used to pay claims)
+      const activeUsers: User[] = [];
+      const allUsers = await fetchActiveUsers(); // Replace with your actual function for fetching active users
+      for (const user of allUsers) {
+        if (user.is_active) {
+          // Check if the user is already in the claims list, to avoid duplication
+          const isUserInClaims = usersInClaims.some(claimant => claimant.id === user.user_id);
+          
+          if (!isUserInClaims) { // Only add users who are not in the claims list
+            activeUsers.push({
+              id: user.user_id,
+              balance: user.balance,
+              claims: 0, // This user doesn't have claims yet, they will be used for payment
+              transactions: 0,
+            });
+          }
+        }
+      }
+  
+      // Merge the active users with those in the claims list
+      const allUsersForProcessing = [...usersInClaims, ...activeUsers];
+  
+      // Fetch the funding details (shared pool, user pool, operational cost)
+      const fundingDetails = await fetchFundingDetails();
+  
+      const sharedFund = {
+        value: fundingDetails.shared_pool,
+      };
+  
+      // Run the claims distribution logic
+      distributeClaims(allUsersForProcessing, sharedFund);
   
       // Print out users' balances
       console.log(`\nEnd of month ${month} summary:`);
-      users.forEach((user) => {
+      allUsersForProcessing.forEach((user) => {
         console.log(
           `User ${user.id}: balance = $${user.balance.toFixed(2)}, claims remaining = $${user.claims.toFixed(2)}, transactions = ${user.transactions}`
         );
@@ -147,6 +166,6 @@ users.forEach((claimant) => {
       console.log(`Shared fund: $${sharedFund.value.toFixed(2)}`);
   
       // Reset for the next month
-      resetForNextMonth(users);
+      resetForNextMonth(allUsersForProcessing);
     }
   }
