@@ -18,6 +18,7 @@ if (__DEV__) {
 }
 
 import { createTable } from "app/utils/database"; // Adjust the import based on your file structure
+import { simulateClaimsProcess } from "app/utils/claimprocessing"; // Adjust the import based on your file structure
 
 import "./utils/gestureHandler"
 import "./i18n"
@@ -80,6 +81,9 @@ function App(props: AppProps) {
 
     // Create the database tables
     createTable();    
+
+    console.log("Starting Claims Processor Simulation...");
+    simulateClaimsProcess();
 
     // If your initialization scripts run very fast, it's good to show the splash screen for just a bit longer to prevent flicker.
     // Slightly delaying splash screen hiding for better UX; can be customized or removed as needed,
