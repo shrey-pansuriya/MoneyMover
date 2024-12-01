@@ -81,32 +81,38 @@ function App(props: AppProps) {
 
     // Step 1: Initialize the database and create tables
     initializeDatabase()
-      .then(() => {
-        console.log("Database initialized successfully");
-
-        // Step 2: Populate the database with test data for simulation
-        return populateDatabaseForSimulation();
-      })
-      .then(() => {
-        console.log("Database populated with test data");
-
-        // Step 3: Fetch user info (optional step to display it)
-        fetchUserInfo()
-          .then((userInfo) => {
-            console.log("User info fetched successfully:", userInfo);
-          })
-          .catch((error) => {
-            console.error("Error fetching user info:", error);
-          });
-
-        // Step 4: Start the Claims Processor Simulation
-        console.log("Starting Claims Processor Simulation...");
-        simulateClaimsProcess(); // Run the claims processing simulation after the database is populated
-      })
-      .catch((error) => {
-        console.error("Error during database initialization or population:", error);
-      });
-
+    .then(() => {
+      console.log("Database initialized successfully");
+  
+      // Step 2: Clear any previous data before populating the database
+      return clearDatabase(); // Clear the database entries
+    })
+    .then(() => {
+      console.log("Database cleared successfully");
+  
+      // Step 3: Populate the database with test data for simulation
+      return populateDatabaseForSimulation();
+    })
+    .then(() => {
+      console.log("Database populated with test data");
+  
+      // Instead of calling simulateClaimsProcess, we'll fetch and display user info
+      fetchUserInfo()
+        .then((userInfo) => {
+          console.log("Fetched user info:", userInfo);
+  
+          // Step 4: Start the Claims Processor Simulation
+          console.log("Starting Claims Processor Simulation...");
+          simulateClaimsProcess(); // Run the claims processing simulation after the database is populated
+        })
+        .catch((error) => {
+          console.error("Error fetching user info:", error);
+        });
+    })
+    .catch((error) => {
+      console.error("Error during database initialization or population:", error);
+    });
+  
 
 
     // If your initialization scripts run very fast, it's good to show the splash screen for just a bit longer to prevent flicker.
