@@ -115,21 +115,29 @@ export async function simulateClaimsProcess() {
 
     // Fetch user subscription details for users in the claims list
     for (const claim of claimsList) {
-      console.log(`Fetching subscription for user ID: ${claim.user_id}`);
-      const userSubscription = await fetchUserSubscription(claim.user_id);
-      if (userSubscription.length > 0) {
-        const user = {
-          id: claim.user_id,
-          balance: userSubscription[0].balance, // Assuming subscription data has balance
-          claims: claim.claim_amount,
-          transactions: 0,
-        };
-        usersInClaims.push(user);
-        console.log(`Added user ${user.id} to the claims list with balance $${user.balance.toFixed(2)} and claim amount $${user.claims.toFixed(2)}.`);
-      } else {
-        console.log(`No subscription data found for user ID: ${claim.user_id}`);
+        console.log(`Fetching subscription for user ID: ${claim.user_id}`);
+      
+        try {
+          const userSubscription = await fetchUserSubscription(claim.user_id);
+      
+          // Check if the subscription exists and handle accordingly
+          if (userSubscription.length > 0) {
+            const user = {
+              id: claim.user_id,
+              balance: userSubscription[0].balance, // Assuming subscription data has balance
+              claims: claim.claim_amount,
+              transactions: 0,
+            };
+      
+            usersInClaims.push(user);
+            console.log(`Added user ${user.id} to the claims list with balance $${user.balance.toFixed(2)} and claim amount $${user.claims.toFixed(2)}.`);
+          } else {
+            console.log(`No subscription data found for user ID: ${claim.user_id}`);
+          }
+        } catch (error) {
+          console.error(`Error fetching subscription for user ID: ${claim.user_id}`, error);
+        }
       }
-    }
 
     // Fetch the active users whose subscriptions are active (whose balance can be used to pay claims)
     const activeUsers: User[] = [];

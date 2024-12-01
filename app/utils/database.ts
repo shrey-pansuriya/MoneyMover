@@ -146,8 +146,7 @@ export const createUserSubscriptionTable = (): Promise<void> => {
   });
 };
 
-// Function to insert a user's subscription with a Promise
-export const insertUserSubscription = (userId: number, planName: string, amount: number, isActive: boolean, purchaseDate: string, claimPriority: number): Promise<void> => {
+export const insertUserSubscription = (userId: number, planName: string, amount: number, isActive: boolean, purchaseDate: string, claimPriority: number, balance: number, transactions: number = 0): Promise<void> => {
   return new Promise((resolve, reject) => {
     if (!db) {
       reject(new Error("Database not initialized"));
@@ -156,9 +155,9 @@ export const insertUserSubscription = (userId: number, planName: string, amount:
 
     db.transaction(tx => {
       tx.executeSql(
-        `INSERT INTO user_subscription (user_id, plan_name, amount, is_active, purchase_date, claim_priority) 
-        VALUES (?, ?, ?, ?, ?, ?);`,
-        [userId, planName, amount, isActive, purchaseDate, claimPriority],
+        `INSERT INTO user_subscription (user_id, plan_name, amount, is_active, purchase_date, claim_priority, balance, transactions) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?);`,
+        [userId, planName, amount, isActive, purchaseDate, claimPriority, balance, transactions],
         () => {
           console.log("User subscription inserted successfully");
           resolve();
@@ -199,13 +198,15 @@ export const updateUserSubscription = (userId: number, planName: string, amount:
   });
 };
 
-// Function to fetch subscription details for a user with a Promise
 export const fetchUserSubscription = (userId: number): Promise<any[]> => {
   return new Promise((resolve, reject) => {
     if (!db) {
+      console.error("Database not initialized");
       reject(new Error("Database not initialized"));
       return;
     }
+
+    console.log(`Fetching subscription data for user ID: ${userId}`);
 
     db.transaction(tx => {
       tx.executeSql(
@@ -213,9 +214,18 @@ export const fetchUserSubscription = (userId: number): Promise<any[]> => {
         [userId],
         (tx, results) => {
           const userSubscription = [];
-          for (let i = 0; i < results.rows.length; i++) {
+          const numRows = results.rows.length;
+          console.log(`Found ${numRows} subscription(s) for user ID: ${userId}`);
+
+          for (let i = 0; i < numRows; i++) {
             userSubscription.push(results.rows.item(i));
+            console.log(`User ${userId} subscription data:`, results.rows.item(i));
           }
+
+          if (numRows === 0) {
+            console.warn(`No subscription data found for user ID: ${userId}`);
+          }
+
           resolve(userSubscription);
         },
         (_, error) => {
@@ -226,6 +236,7 @@ export const fetchUserSubscription = (userId: number): Promise<any[]> => {
     });
   });
 };
+
 
 // Function to reset user balances at the beginning of each month with a Promise
 export const resetUserBalances = (): Promise<void> => {
@@ -726,11 +737,12 @@ export const populateDatabaseForSimulation = async () => {
     const user5Id = await insertUserInfo("Chris", "Brown", 33, "202 Birch St", "555-7890");
 
     // Insert subscriptions for each user into the user_subscription table
-    if (user1Id) await insertUserSubscription(user1Id, "Basic", 200, true, "2024-01-01", 3);
-    if (user2Id) await insertUserSubscription(user2Id, "Premium", 300, true, "2024-01-01", 2);
-    if (user3Id) await insertUserSubscription(user3Id, "Gold", 400, true, "2024-01-01", 1);
-    if (user4Id) await insertUserSubscription(user4Id, "Basic", 200, true, "2024-01-01", 3);
-    if (user5Id) await insertUserSubscription(user5Id, "Premium", 300, true, "2024-01-01", 2);
+    if (user1Id) await insertUserSubscription(user1Id, "Basic", 200, true, "2024-01-01", 3, 200, 0); // balance set to 200
+    if (user2Id) await insertUserSubscription(user2Id, "Premium", 300, true, "2024-01-01", 2, 300, 0); // balance set to 300
+    if (user3Id) await insertUserSubscription(user3Id, "Gold", 400, true, "2024-01-01", 1, 400, 0); // balance set to 400
+    if (user4Id) await insertUserSubscription(user4Id, "Basic", 200, true, "2024-01-01", 3, 200, 0); // balance set to 200
+    if (user5Id) await insertUserSubscription(user5Id, "Premium", 300, true, "2024-01-01", 2, 300, 0); // balance set to 300
+
 
     // Insert claims for only some users into the claims_list table (not all users)
     if (user1Id) await insertClaim(user1Id, 250, 3); // John submits a $250 claim
