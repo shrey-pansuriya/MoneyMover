@@ -93,7 +93,7 @@ function App(props: AppProps) {
         // Step 3: Fetch user info (optional step to display it)
         fetchUserInfo()
           .then((userInfo) => {
-            console.log("User info fetched successfully");
+            console.log("User info fetched successfully:", userInfo);
           })
           .catch((error) => {
             console.error("Error fetching user info:", error);
