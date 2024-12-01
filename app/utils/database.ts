@@ -746,5 +746,39 @@ export const populateDatabaseForSimulation = async () => {
   }
 };
 
+export const clearDatabase = (): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    if (!db) {
+      reject(new Error("Database not initialized"));
+      return;
+    }
+
+    db.transaction(tx => {
+      // Clear data from all relevant tables
+      tx.executeSql(
+        `DELETE FROM user_info;`,
+        [],
+        () => {
+          console.log("Deleted all user info.");
+          tx.executeSql(`DELETE FROM user_subscription;`, [], () => {
+            console.log("Deleted all user subscriptions.");
+            tx.executeSql(`DELETE FROM claims_list;`, [], () => {
+              console.log("Deleted all claims.");
+              tx.executeSql(`DELETE FROM fundings;`, [], () => {
+                console.log("Deleted all funding data.");
+                resolve(); // Resolve when all data has been deleted
+              });
+            });
+          });
+        },
+        (_, error) => {
+          console.error("Error clearing database: ", error.message);
+          reject(error); // Reject the promise in case of error
+        }
+      );
+    });
+  });
+};
+
 export default db;
 

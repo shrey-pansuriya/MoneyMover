@@ -17,7 +17,7 @@ if (__DEV__) {
   require("./devtools/ReactotronConfig.ts")
 }
 
-import { initializeDatabase, populateDatabaseForSimulation, fetchUserInfo } from "app/utils/database"; 
+import { initializeDatabase, populateDatabaseForSimulation, fetchUserInfo, clearDatabase } from "app/utils/database"; 
 import { simulateClaimsProcess } from "app/utils/claimprocessing"; // Adjust the import based on your file structure
 
 import "./utils/gestureHandler"
@@ -84,7 +84,13 @@ function App(props: AppProps) {
     .then(() => {
       console.log("Database initialized successfully");
 
-      // Step 2: Populate the database with test data for simulation
+      // Step 2: Clear any previous data before populating the database
+      return clearDatabase(); // Clear the database entries
+    })
+    .then(() => {
+      console.log("Database cleared successfully");
+
+      // Step 3: Populate the database with test data for simulation
       return populateDatabaseForSimulation();
     })
     .then(() => {
