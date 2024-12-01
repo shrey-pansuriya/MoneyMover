@@ -737,11 +737,11 @@ export const populateDatabaseForSimulation = async () => {
     const user5Id = await insertUserInfo("Chris", "Brown", 33, "202 Birch St", "555-7890");
 
     // Insert subscriptions for each user into the user_subscription table
-    if (user1Id) await insertUserSubscription(user1Id, "Basic", 200, true, "2024-01-01", 3, 200, 0); // balance set to 200
-    if (user2Id) await insertUserSubscription(user2Id, "Premium", 300, true, "2024-01-01", 2, 300, 0); // balance set to 300
-    if (user3Id) await insertUserSubscription(user3Id, "Gold", 400, true, "2024-01-01", 1, 400, 0); // balance set to 400
-    if (user4Id) await insertUserSubscription(user4Id, "Basic", 200, true, "2024-01-01", 3, 200, 0); // balance set to 200
-    if (user5Id) await insertUserSubscription(user5Id, "Premium", 300, true, "2024-01-01", 2, 300, 0); // balance set to 300
+    if (user1Id) await insertUserSubscription(user1Id, "Basic", 200, true, "2024-01-01", 3, 200, 0);
+    if (user2Id) await insertUserSubscription(user2Id, "Premium", 300, true, "2024-01-01", 2, 300, 0);
+    if (user3Id) await insertUserSubscription(user3Id, "Gold", 400, true, "2024-01-01", 1, 400, 0);
+    if (user4Id) await insertUserSubscription(user4Id, "Basic", 200, true, "2024-01-01", 3, 200, 0);
+    if (user5Id) await insertUserSubscription(user5Id, "Premium", 300, true, "2024-01-01", 2, 300, 0);
 
 
     // Insert claims for only some users into the claims_list table (not all users)
