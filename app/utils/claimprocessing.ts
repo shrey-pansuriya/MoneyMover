@@ -42,21 +42,50 @@ type User = {
     });
   
     // Step 3: Cover remaining claims using the shared fund
-    users.forEach((claimant) => {
-      if (claimant.claims > 0) {
-        const remainingClaim = claimant.claims;
-        if (sharedFund.value > 0) {
+users.forEach((claimant) => {
+    if (claimant.claims > 0) {
+      let remainingClaim = claimant.claims;
+  
+      if (remainingClaim > 0 && sharedFund.value > 0) {
+        if (sharedFund.value < remainingClaim) {
+          // If using the shared fund would deplete it, pay only 50% of the claim
+          const fromFund = sharedFund.value * 0.5; // Only pay 50% of the remaining claim
+          sharedFund.value -= fromFund;
+          claimant.claims -= fromFund;
+          remainingClaim -= fromFund;
+  
+          console.log(
+            `Shared fund pays $${fromFund.toFixed(2)} to User ${claimant.id}.`
+          );
+  
+          // Inform user about the remaining amount
+          console.log(
+            `User ${claimant.id} must pay the remaining $${remainingClaim.toFixed(
+              2
+            )} using their own balance.`
+          );
+        } else {
+          // If the shared fund can cover the remaining claim
           const fromFund = Math.min(remainingClaim, sharedFund.value);
           sharedFund.value -= fromFund;
           claimant.claims -= fromFund;
-          console.log(`Shared fund pays $${fromFund.toFixed(2)} to User ${claimant.id}.`);
+          remainingClaim -= fromFund;
   
-          if (claimant.claims > 0) {
-            console.log(`User ${claimant.id} still has $${claimant.claims.toFixed(2)} in unpaid claims.`);
-          }
+          console.log(
+            `Shared fund pays $${fromFund.toFixed(2)} to User ${claimant.id}.`
+          );
+        }
+  
+        if (remainingClaim > 0) {
+          console.log(
+            `User ${claimant.id} still has $${remainingClaim.toFixed(
+              2
+            )} in unpaid claims.`
+          );
         }
       }
-    });
+    }
+  });
   
     // Step 4: Move remaining balances to the shared fund
     users.forEach((user) => {
