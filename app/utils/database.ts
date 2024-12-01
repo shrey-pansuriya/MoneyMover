@@ -75,6 +75,40 @@ export const insertUserInfo = (firstName: string, lastName: string, age: number,
   });
 };
 
+// Function to fetch all user information from the user_info table
+export const fetchUserInfo = (): Promise<any[]> => {
+  return new Promise((resolve, reject) => {
+    if (!db) {
+      reject(new Error("Database not initialized"));
+      return;
+    }
+
+    db.transaction(tx => {
+      tx.executeSql(
+        `SELECT * FROM user_info;`, // SQL query to select all data from user_info table
+        [],
+        (tx, results) => {
+          const userInfo: any[] = [];
+          for (let i = 0; i < results.rows.length; i++) {
+            userInfo.push(results.rows.item(i)); // Push each row to the userInfo array
+          }
+
+          // Log the results to the console for debugging
+          console.log("User Info:", userInfo);
+
+          // Resolve the promise with the fetched user data
+          resolve(userInfo);
+        },
+        (_, error) => {
+          console.error("Error fetching user info: ", error.message);
+          reject(error); // Reject the promise in case of error
+        }
+      );
+    });
+  });
+};
+
+
 // Function to create the user_subscription table with a Promise
 export const createUserSubscriptionTable = (): Promise<void> => {
   return new Promise((resolve, reject) => {
