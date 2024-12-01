@@ -99,73 +99,90 @@ type User = {
       user.transactions = 0;
     });
   }
-  
-  export async function simulateClaimsProcess() {
-    const totalMonths = 1; // For testing, we'll simulate only one month
-  
-    for (let month = 1; month <= totalMonths; month++) {
-      console.log(`\n=================================\nStart month ${month}`);
-  
-      // Fetch the pending claims list to determine users who have submitted claims
-      const claimsList = await fetchPendingClaims();
-      const usersInClaims: User[] = [];
-  
-      // Fetch user subscription details for users in the claims list
-      for (const claim of claimsList) {
-        const userSubscription = await fetchUserSubscription(claim.user_id);
-        if (userSubscription.length > 0) {
-          const user = {
-            id: claim.user_id,
-            balance: userSubscription[0].balance, // Assuming subscription data has balance
-            claims: claim.claim_amount,
-            transactions: 0,
-          };
-          usersInClaims.push(user);
-        }
+
+export async function simulateClaimsProcess() {
+  const totalMonths = 1; // For testing, we'll simulate only one month
+  console.log("Starting Claims Processor Simulation...");
+
+  for (let month = 1; month <= totalMonths; month++) {
+    console.log(`\n=================================\nStart month ${month}`);
+
+    // Fetch the pending claims list to determine users who have submitted claims
+    const claimsList = await fetchPendingClaims();
+    console.log(`Fetched ${claimsList.length} pending claims.`);
+
+    const usersInClaims: User[] = [];
+
+    // Fetch user subscription details for users in the claims list
+    for (const claim of claimsList) {
+      console.log(`Fetching subscription for user ID: ${claim.user_id}`);
+      const userSubscription = await fetchUserSubscription(claim.user_id);
+      if (userSubscription.length > 0) {
+        const user = {
+          id: claim.user_id,
+          balance: userSubscription[0].balance, // Assuming subscription data has balance
+          claims: claim.claim_amount,
+          transactions: 0,
+        };
+        usersInClaims.push(user);
+        console.log(`Added user ${user.id} to the claims list with balance $${user.balance.toFixed(2)} and claim amount $${user.claims.toFixed(2)}.`);
+      } else {
+        console.log(`No subscription data found for user ID: ${claim.user_id}`);
       }
-  
-      // Fetch the active users whose subscriptions are active (whose balance can be used to pay claims)
-      const activeUsers: User[] = [];
-      const allUsers = await fetchActiveUsers(); // Replace with your actual function for fetching active users
-      for (const user of allUsers) {
-        if (user.is_active) {
-          // Check if the user is already in the claims list, to avoid duplication
-          const isUserInClaims = usersInClaims.some(claimant => claimant.id === user.user_id);
-          
-          if (!isUserInClaims) { // Only add users who are not in the claims list
-            activeUsers.push({
-              id: user.user_id,
-              balance: user.balance,
-              claims: 0, // This user doesn't have claims yet, they will be used for payment
-              transactions: 0,
-            });
-          }
-        }
-      }
-  
-      // Merge the active users with those in the claims list
-      const allUsersForProcessing = [...usersInClaims, ...activeUsers];
-  
-      // Fetch the funding details (shared pool, user pool, operational cost)
-      const fundingDetails = await fetchFundingDetails();
-  
-      const sharedFund = {
-        value: fundingDetails.shared_pool,
-      };
-  
-      // Run the claims distribution logic
-      distributeClaims(allUsersForProcessing, sharedFund);
-  
-      // Print out users' balances
-      console.log(`\nEnd of month ${month} summary:`);
-      allUsersForProcessing.forEach((user) => {
-        console.log(
-          `User ${user.id}: balance = $${user.balance.toFixed(2)}, claims remaining = $${user.claims.toFixed(2)}, transactions = ${user.transactions}`
-        );
-      });
-      console.log(`Shared fund: $${sharedFund.value.toFixed(2)}`);
-  
-      // Reset for the next month
-      resetForNextMonth(allUsersForProcessing);
     }
+
+    // Fetch the active users whose subscriptions are active (whose balance can be used to pay claims)
+    const activeUsers: User[] = [];
+    const allUsers = await fetchActiveUsers(); // Replace with your actual function for fetching active users
+    console.log(`Fetched ${allUsers.length} active users.`);
+
+    for (const user of allUsers) {
+      if (user.is_active) {
+        // Check if the user is already in the claims list, to avoid duplication
+        const isUserInClaims = usersInClaims.some(claimant => claimant.id === user.user_id);
+
+        if (!isUserInClaims) { // Only add users who are not in the claims list
+          activeUsers.push({
+            id: user.user_id,
+            balance: user.balance,
+            claims: 0, // This user doesn't have claims yet, they will be used for payment
+            transactions: 0,
+          });
+          console.log(`Added active user ${user.user_id} to pay claims with balance $${user.balance.toFixed(2)}.`);
+        }
+      }
+    }
+
+    // Merge the active users with those in the claims list
+    const allUsersForProcessing = [...usersInClaims, ...activeUsers];
+    console.log(`Total users for processing: ${allUsersForProcessing.length} (claims and active users).`);
+
+    // Fetch the funding details (shared pool, user pool, operational cost)
+    const fundingDetails = await fetchFundingDetails();
+    console.log("Fetched funding details:", fundingDetails);
+
+    const sharedFund = {
+      value: fundingDetails.shared_pool,
+    };
+    console.log(`Shared fund: $${sharedFund.value.toFixed(2)}`);
+
+    // Run the claims distribution logic
+    console.log("Running claims distribution logic...");
+    distributeClaims(allUsersForProcessing, sharedFund);
+
+    // Print out users' balances after distribution
+    console.log(`\nEnd of month ${month} summary:`);
+    allUsersForProcessing.forEach((user) => {
+      console.log(
+        `User ${user.id}: balance = $${user.balance.toFixed(2)}, claims remaining = $${user.claims.toFixed(2)}, transactions = ${user.transactions}`
+      );
+    });
+    console.log(`Shared fund: $${sharedFund.value.toFixed(2)}`);
+
+    // Reset for the next month
+    console.log("Resetting data for the next month...");
+    resetForNextMonth(allUsersForProcessing);
   }
+
+  console.log("Claims Processor Simulation completed.");
+}
