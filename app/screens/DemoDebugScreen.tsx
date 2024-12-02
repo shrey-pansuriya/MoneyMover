@@ -6,8 +6,7 @@ import { DemoTabScreenProps } from "../navigators/DemoNavigator"
 import { colors, spacing } from "../theme"
 import { isRTL } from "../i18n"
 import { useStores } from "../models"
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { authStore } from "../utils/authstore";  // Import the MobX auth store
+
 /**
  * Component to display contact information modal.
  */
@@ -101,12 +100,9 @@ const ChangeProfileInfoModal: FC<{ visible: boolean; onClose: () => void }> = ({
 export const DemoDebugScreen: FC<DemoTabScreenProps<"Settings">> = function DemoDebugScreen(
   _props,
 ) {
-
-  const logout = async () => {
-    console.log('Logging out...');
-    await AsyncStorage.removeItem('authToken'); // Remove token from AsyncStorage
-    authStore.isAuthenticated = false; // Set the isAuthenticated flag to false
-  }
+  const {
+    authenticationStore: { logout },
+  } = useStores()
 
   const [contactModalVisible, setContactModalVisible] = useState(false)
   const [profileModalVisible, setProfileModalVisible] = useState(false) // Declare setProfileModalVisible state

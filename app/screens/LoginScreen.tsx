@@ -5,68 +5,50 @@ import { Button, Icon, Screen, Text, TextField, TextFieldAccessoryProps } from "
 import { useStores } from "../models"
 import { AppStackScreenProps } from "../navigators"
 import { colors, spacing } from "../theme"
-import { fetchUserLogin } from "../utils/database" // Import the function to fetch login details
-import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage for storing token
-import { authStore } from "../utils/authstore";  // Import the MobX auth store
 
 interface LoginScreenProps extends AppStackScreenProps<"Login"> {}
 
 export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_props) {
-  const authPasswordInput = useRef<TextInput>(null);
+  const authPasswordInput = useRef<TextInput>(null)
 
-  const [authPassword, setAuthPassword] = useState("");
-  const [authEmail, setAuthEmail] = useState("");
-  const [isAuthPasswordHidden, setIsAuthPasswordHidden] = useState(true);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [attemptsCount, setAttemptsCount] = useState(0);
-  const [validationError, setValidationError] = useState("");
+  const [authPassword, setAuthPassword] = useState("")
+  const [isAuthPasswordHidden, setIsAuthPasswordHidden] = useState(true)
+  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [attemptsCount, setAttemptsCount] = useState(0)
+  const {
+    authenticationStore: { authEmail, setAuthEmail, setAuthToken, validationError },
+  } = useStores()
 
   useEffect(() => {
-    // Pre-fill email from the MobX store or any stored user data
-    if (authStore.isAuthenticated) {
-      setAuthEmail(authStore.userEmail || "");  // Pre-fill email if user is authenticated already
-    }
+    // Here is where you could fetch credentials from keychain or storage
+    // and pre-fill the form fields.
+    setAuthEmail("ignite@infinite.red")
+    setAuthPassword("ign1teIsAwes0m3")
 
+    // Return a "cleanup" function that React will run when the component unmounts
     return () => {
-      setAuthPassword("");
-      setAuthEmail("");
-    };
-  }, []);
-
-  const error = isSubmitted ? validationError : "";
-
-  async function login() {
-    setIsSubmitted(true);
-    setAttemptsCount(attemptsCount + 1);
-
-    console.log("Login attempt with email:", authEmail);
-    console.log("Password entered:", authPassword);
-
-    // Fetch login details from the database for the entered email
-    const user = await fetchUserLogin(authEmail);
-    console.log("Fetched user data:", user);
-
-    if (user && user.password === authPassword) {
-      console.log("Login successful!");
-      const token = String(Date.now()); // Mocking a successful login with a token
-
-      // Save token to AsyncStorage and MobX store
-      await authStore.login(token, authEmail);  // Use MobX store to update the state
-
-      setIsSubmitted(false);
-      setAuthPassword("");
-      setAuthEmail("");
-    } else {
-      console.log("Invalid credentials or password mismatch.");
-      setValidationError("Invalid email or password");
+      setAuthPassword("")
+      setAuthEmail("")
     }
-  }
+  }, [])
 
-  async function logout() {
-    // Clear token from AsyncStorage and reset MobX store
-    await authStore.logout();
-  }
+  const error = isSubmitted ? validationError : ""
 
+  function login() {
+    setIsSubmitted(true)
+    setAttemptsCount(attemptsCount + 1)
+
+    if (validationError) return
+
+    // Make a request to your server to get an authentication token.
+    // If successful, reset the fields and set the token.
+    setIsSubmitted(false)
+    setAuthPassword("")
+    setAuthEmail("")
+
+    // We'll mock this with a fake token.
+    setAuthToken(String(Date.now()))
+  }
 
   const PasswordRightAccessory: ComponentType<TextFieldAccessoryProps> = useMemo(
     () =>
