@@ -109,7 +109,60 @@ export const fetchUserInfo = (): Promise<any[]> => {
 };
 
 
-// Function to create the user_subscription table with a Promise
+// Function to create the user_login table with a Promise
+export const createUserLoginTable = (): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    if (!db) {
+      reject(new Error("Database not initialized"));
+      return;
+    }
+
+    db.transaction((tx) => {
+      tx.executeSql(
+        `CREATE TABLE IF NOT EXISTS user_login (
+          user_id INTEGER PRIMARY KEY,              -- Linked to user_info table
+          email TEXT NOT NULL UNIQUE,               -- Email must be unique
+          password TEXT NOT NULL,                   -- Store hashed passwords
+          FOREIGN KEY(user_id) REFERENCES user_info(user_id) ON DELETE CASCADE
+        );`,
+        [],
+        () => {
+          console.log("User login table created successfully");
+          resolve();
+        },
+        (_, error) => {
+          console.error("Error creating user_login table:", error.message);
+          reject(error);
+        }
+      );
+    });
+  });
+};
+// Function to insert user login details with a Promise
+export const insertUserLogin = (userId: number, email: string, password: string): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    if (!db) {
+      reject(new Error("Database not initialized"));
+      return;
+    }
+
+    db.transaction((tx) => {
+      tx.executeSql(
+        `INSERT INTO user_login (user_id, email, password) VALUES (?, ?, ?);`,
+        [userId, email, password],
+        () => {
+          console.log(`User login inserted successfully for user_id: ${userId}`);
+          resolve();
+        },
+        (_, error) => {
+          console.error(`Error inserting user login for user_id: ${userId}`, error.message);
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
 export const createUserSubscriptionTable = (): Promise<void> => {
   return new Promise((resolve, reject) => {
     if (!db) {
@@ -118,27 +171,40 @@ export const createUserSubscriptionTable = (): Promise<void> => {
     }
 
     db.transaction(tx => {
+      // Drop the old table if it exists
       tx.executeSql(
-        `CREATE TABLE IF NOT EXISTS user_subscription (
-          id INTEGER PRIMARY KEY AUTOINCREMENT, 
-          user_id INTEGER, 
-          plan_name TEXT, 
-          amount INTEGER, 
-          balance REAL DEFAULT 0, 
-          transactions INTEGER DEFAULT 0, 
-          is_active BOOLEAN, 
-          purchase_date DATE, 
-          claim_priority INTEGER, 
-          last_updated DATE DEFAULT (datetime('now', 'localtime')), 
-          FOREIGN KEY(user_id) REFERENCES user_info(user_id)
-        );`,
+        `DROP TABLE IF EXISTS user_subscription;`,
         [],
         () => {
-          console.log("User subscription table created successfully");
-          resolve();
+          console.log("Dropped old user_subscription table.");
+          // Create the new table
+          tx.executeSql(
+            `CREATE TABLE user_subscription (
+               id INTEGER PRIMARY KEY AUTOINCREMENT, 
+               user_id INTEGER, 
+               plan_name TEXT, 
+               amount INTEGER, 
+               balance REAL DEFAULT 0, 
+               transactions INTEGER DEFAULT 0, 
+               is_active BOOLEAN, 
+               purchase_date DATE, 
+               claim_priority INTEGER, 
+               last_updated DATE DEFAULT (datetime('now', 'localtime')), 
+               FOREIGN KEY(user_id) REFERENCES user_info(user_id)
+             );`,
+            [],
+            () => {
+              console.log("User subscription table created successfully");
+              resolve();
+            },
+            (_, error) => {
+              console.error("Error creating user_subscription table: ", error.message);
+              reject(error);
+            }
+          );
         },
         (_, error) => {
-          console.error("Error creating user_subscription table: ", error.message);
+          console.error("Error dropping old user_subscription table: ", error.message);
           reject(error);
         }
       );
@@ -146,7 +212,42 @@ export const createUserSubscriptionTable = (): Promise<void> => {
   });
 };
 
-export const insertUserSubscription = (userId: number, planName: string, amount: number, isActive: boolean, purchaseDate: string, claimPriority: number, balance: number, transactions: number = 0): Promise<void> => {
+
+export const insertUserSubscription = (userId: number, planName: string, amount: number, isActive: boolean, purchaseDate: string, claimPriority: number, balance: number = 0, transactions: number = 0): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    if (!db) {
+      reject(new Error("Database not initialized"));
+      return;
+    }
+
+    console.log("DB Initialized, hello starting transaction...");
+
+    db.transaction(tx => {
+      console.log("Transaction started for user subscription");
+      tx.executeSql(
+        `INSERT INTO user_subscription (user_id, plan_name, amount, is_active, purchase_date, claim_priority, balance, transactions) 
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?);`,
+        [userId, planName, amount, isActive, purchaseDate, claimPriority, balance, transactions],
+        (_, result) => {
+          console.log("User subscription inserted successfully with result:", result);
+          resolve();
+        },
+        (_, error) => {
+          console.error("Error inserting user subscription: ", error.message);
+          reject(error);
+        }
+      );
+      console.log("SQL executed"); // Add a log after calling executeSql
+    }, error => {
+      console.error("Transaction failed:", error.message); // This will catch transaction-level errors
+      reject(error);
+    }, () => {
+      console.log("Transaction completed successfully");
+    });
+  });
+};
+
+export const fetchUserLogin = (email: string): Promise<{ email: string; password: string } | null> => {
   return new Promise((resolve, reject) => {
     if (!db) {
       reject(new Error("Database not initialized"));
@@ -155,16 +256,23 @@ export const insertUserSubscription = (userId: number, planName: string, amount:
 
     db.transaction(tx => {
       tx.executeSql(
-        `INSERT INTO user_subscription (user_id, plan_name, amount, is_active, purchase_date, claim_priority, balance, transactions) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?);`,
-        [userId, planName, amount, isActive, purchaseDate, claimPriority, balance, transactions],
-        () => {
-          console.log("User subscription inserted successfully");
-          resolve();
+        `SELECT email, password FROM user_login WHERE email = ?;`,  // Query to fetch email and password
+        [email],
+        (_, results) => {
+          if (results.rows.length > 0) {
+            // Assuming there's only one record for each email
+            const user = results.rows.item(0);
+            resolve({
+              email: user.email,
+              password: user.password, // Return both email and password
+            });
+          } else {
+            resolve(null); // Return null if no matching user found
+          }
         },
         (_, error) => {
-          console.error("Error inserting user subscription: ", error.message);
-          reject(error);
+          console.error("Error fetching user login:", error.message);
+          reject(error); // Reject if there's an error during query execution
         }
       );
     });
@@ -717,6 +825,7 @@ export const fetchAggregateData = (): Promise<any> => {
 export const initializeDatabase = async (): Promise<void> => {
   try {
     await createUserInfoTable();  // Create user_info table
+    await createUserLoginTable();  // Create user_login table
     await createUserSubscriptionTable();  // Create user_subscription table
     await createClaimsListTable();  // Create claims_list table
     await createFundingsTable();  // Create fundings table
@@ -736,6 +845,17 @@ export const populateDatabaseForSimulation = async () => {
     const user4Id = await insertUserInfo("Emily", "Davis", 40, "101 Pine St", "555-4567");
     const user5Id = await insertUserInfo("Chris", "Brown", 33, "202 Birch St", "555-7890");
 
+    console.log("Moving on to inserting logins");
+
+    // Insert login details for each user into the user_login table
+    if (user1Id) await insertUserLogin(user1Id, "john.doe@example.com", "password123");
+    if (user2Id) await insertUserLogin(user2Id, "jane.smith@example.com", "securepassword");
+    if (user3Id) await insertUserLogin(user3Id, "mike.johnson@example.com", "mypassword");
+    if (user4Id) await insertUserLogin(user4Id, "emily.davis@example.com", "password456");
+    if (user5Id) await insertUserLogin(user5Id, "chris.brown@example.com", "adminpassword");
+
+    console.log("moving on to inserting subscriptions");
+
     // Insert subscriptions for each user into the user_subscription table
     if (user1Id) await insertUserSubscription(user1Id, "Basic", 200, true, "2024-01-01", 3, 200, 0);
     if (user2Id) await insertUserSubscription(user2Id, "Premium", 300, true, "2024-01-01", 2, 300, 0);
@@ -743,14 +863,21 @@ export const populateDatabaseForSimulation = async () => {
     if (user4Id) await insertUserSubscription(user4Id, "Basic", 200, true, "2024-01-01", 3, 200, 0);
     if (user5Id) await insertUserSubscription(user5Id, "Premium", 300, true, "2024-01-01", 2, 300, 0);
 
-
+    console.log("moving on to inserting claims");
     // Insert claims for only some users into the claims_list table (not all users)
-    if (user1Id) await insertClaim(user1Id, 250, 3); // John submits a $250 claim
-    if (user2Id) await insertClaim(user2Id, 300, 2); // Jane submits a $300 claim
-    // No claims for Mike, Emily, and Chris (they won’t be in the claims list)
+    if (user1Id) {
+      await insertClaim(user1Id, 250, 3); // John submits a $250 claim
+      console.log("Claim inserted for user_id:", user1Id);
+    }
+    if (user2Id) {
+      await insertClaim(user2Id, 300, 2); // Jane submits a $300 claim
+      console.log("Claim inserted for user_id:", user2Id);
+    }
 
+    console.log("moving on to inserting funding data");
     // Insert funding data into the fundings table
     await insertFunding(1000, 0, 0); // Initial shared pool = 1000, user pool = 0, operational cost = 0
+    console.log("Funding data inserted");
 
     console.log("Database populated for simulation.");
   } catch (error) {
@@ -772,13 +899,32 @@ export const clearDatabase = (): Promise<void> => {
         [],
         () => {
           console.log("Deleted all user info.");
-          tx.executeSql(`DELETE FROM user_subscription;`, [], () => {
-            console.log("Deleted all user subscriptions.");
-            tx.executeSql(`DELETE FROM claims_list;`, [], () => {
-              console.log("Deleted all claims.");
-              tx.executeSql(`DELETE FROM fundings;`, [], () => {
-                console.log("Deleted all funding data.");
-                resolve(); // Resolve when all data has been deleted
+          // Reset AUTO_INCREMENT for user_info table
+          tx.executeSql(`UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME='user_info';`, [], () => {
+            console.log("Reset AUTO_INCREMENT for user_info.");
+
+            tx.executeSql(`DELETE FROM user_subscription;`, [], () => {
+              console.log("Deleted all user subscriptions.");
+              // Reset AUTO_INCREMENT for user_subscription table
+              tx.executeSql(`UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME='user_subscription';`, [], () => {
+                console.log("Reset AUTO_INCREMENT for user_subscription.");
+
+                tx.executeSql(`DELETE FROM claims_list;`, [], () => {
+                  console.log("Deleted all claims.");
+                  // Reset AUTO_INCREMENT for claims_list table
+                  tx.executeSql(`UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME='claims_list';`, [], () => {
+                    console.log("Reset AUTO_INCREMENT for claims_list.");
+
+                    tx.executeSql(`DELETE FROM fundings;`, [], () => {
+                      console.log("Deleted all funding data.");
+                      // Reset AUTO_INCREMENT for fundings table
+                      tx.executeSql(`UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME='fundings';`, [], () => {
+                        console.log("Reset AUTO_INCREMENT for fundings.");
+                        resolve(); // Resolve when all data has been deleted and counters reset
+                      });
+                    });
+                  });
+                });
               });
             });
           });
@@ -791,6 +937,7 @@ export const clearDatabase = (): Promise<void> => {
     });
   });
 };
+
 
 export default db;
 
