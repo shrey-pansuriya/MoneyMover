@@ -821,6 +821,136 @@ export const fetchAggregateData = (): Promise<any> => {
   });
 };
 
+
+export const createTransactionsTable = (): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    if (!db) {
+      reject(new Error("Database not initialized"));
+      return;
+    }
+
+    console.log('Starting transaction...');
+
+    db.transaction(tx => {
+      // Create transactions table with necessary columns
+      tx.executeSql(
+        `CREATE TABLE IF NOT EXISTS transactions (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          from_user_id INTEGER NOT NULL,
+          to_user_id INTEGER NOT NULL,
+          amount REAL NOT NULL,
+          transfer_accepted BOOLEAN DEFAULT FALSE,
+          incoming_payment BOOLEAN DEFAULT FALSE,
+          outgoing_payment BOOLEAN DEFAULT FALSE,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );`,
+        [],
+        () => {
+          console.log("Transactions table created successfully with all columns.");
+          resolve();
+        },
+        (_, error) => {
+          console.error("Error creating transactions table: ", error.message);
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+
+export const insertTransaction = (
+  fromUserId: number, 
+  toUserId: number, 
+  amount: number, 
+  transferAccepted: boolean = false, 
+  incomingPayment: boolean = false, 
+  outgoingPayment: boolean = false
+): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    if (!db) {
+      reject(new Error("Database not initialized"));
+      return;
+    }
+
+    db.transaction(tx => {
+      // Insert a new transaction record
+      tx.executeSql(
+        `INSERT INTO transactions (
+           from_user_id, 
+           to_user_id, 
+           amount, 
+           transfer_accepted, 
+           incoming_payment, 
+           outgoing_payment
+         ) VALUES (?, ?, ?, ?, ?, ?)`,
+        [fromUserId, toUserId, amount, transferAccepted, incomingPayment, outgoingPayment],
+        () => {
+          console.log("Transaction inserted successfully");
+          resolve();
+        },
+        (_, error) => {
+          console.error("Error inserting transaction: ", error.message);
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+export const fetchAllTransactions = (): Promise<any[]> => {
+  return new Promise((resolve, reject) => {
+    if (!db) {
+      reject(new Error("Database not initialized"));
+      return;
+    }
+
+    db.transaction(tx => {
+      // Fetch all transactions from the transactions table
+      tx.executeSql(
+        `SELECT * FROM transactions;`,
+        [],
+        (_, result) => {
+          const transactions = result.rows.raw(); // Fetch all rows as an array
+          resolve(transactions);
+        },
+        (_, error) => {
+          console.error("Error fetching transactions: ", error.message);
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+
+export const fetchTransactions = (userId: number): Promise<any[]> => {
+  return new Promise((resolve, reject) => {
+    if (!db) {
+      reject(new Error("Database not initialized"));
+      return;
+    }
+
+    db.transaction(tx => {
+      // Fetch transactions where the user is either the claimant or the payer
+      tx.executeSql(
+        `SELECT * FROM transactions 
+         WHERE from_user_id = ? OR to_user_id = ?`,
+        [userId, userId],
+        (_, result) => {
+          const transactions = result.rows.raw(); // Fetch all rows as an array
+          resolve(transactions);
+        },
+        (_, error) => {
+          console.error("Error fetching transactions: ", error.message);
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
 // Function to initialize all database tables with a Promise
 export const initializeDatabase = async (): Promise<void> => {
   try {
@@ -829,6 +959,8 @@ export const initializeDatabase = async (): Promise<void> => {
     await createUserSubscriptionTable();  // Create user_subscription table
     await createClaimsListTable();  // Create claims_list table
     await createFundingsTable();  // Create fundings table
+    await createTransactionsTable();  // Create transactions table
+    
 
     console.log("All tables initialized successfully");
   } catch (error) {

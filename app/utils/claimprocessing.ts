@@ -1,4 +1,4 @@
-import { fetchPendingClaims, fetchUserSubscription, fetchFundingDetails, fetchActiveUsers } from "app/utils/database"; // Add necessary imports for database queries
+import { fetchPendingClaims, fetchUserSubscription, fetchFundingDetails, fetchActiveUsers, insertTransaction, fetchAllTransactions } from "app/utils/database"; // Add necessary imports for database queries
 
 type User = {
     id: number;
@@ -32,7 +32,15 @@ type User = {
               toPay -= payment;
               claimant.claims -= payment;
               payer.transactions++;
-              console.log(`User ${payer.id} pays $${payment.toFixed(2)} to User ${claimant.id}.`);
+
+             // Record the transaction in the transactions table
+             insertTransaction(payer.id, claimant.id, payment, false, false, true)
+             .then(() => {
+               console.log(`User ${payer.id} pays $${payment.toFixed(2)} to User ${claimant.id}.`);
+             })
+             .catch((err) => {
+               console.error("Error inserting transaction:", err);
+             });
   
               if (payer.transactions === 2) break;
             }
@@ -187,10 +195,21 @@ export async function simulateClaimsProcess() {
     });
     console.log(`Shared fund: $${sharedFund.value.toFixed(2)}`);
 
+    fetchAllTransactions().then((transactions) => {
+        transactions.forEach((transaction) => {
+          console.log(`Transaction ID: ${transaction.id}, From User: ${transaction.from_user_id}, To User: ${transaction.to_user_id}, Amount: $${transaction.amount.toFixed(2)}`);
+        });
+      }).catch((err) => {
+        console.error("Error fetching transactions:", err);
+      });
+
+      
     // Reset for the next month
     console.log("Resetting data for the next month...");
     resetForNextMonth(allUsersForProcessing);
   }
+ 
+
 
   console.log("Claims Processor Simulation completed.");
 }
