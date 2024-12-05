@@ -8,7 +8,7 @@ type User = {
   };
   
   // Distribute claims based on the logic provided
-  function distributeClaims(users: User[], sharedFund: { value: number }) {
+  async function distributeClaims(users: User[], sharedFund: { value: number }) {
     // Step 1: Self-payment of claims
     users.forEach((claimant) => {
       if (claimant.claims > 0) {
@@ -20,35 +20,34 @@ type User = {
     });
   
     // Step 2: Pay remaining claims using other users' balances
-    users.forEach((claimant) => {
-      if (claimant.claims > 0) {
+    for (const claimant of users) {
+        if (claimant.claims > 0) {
         let toPay = claimant.claims;
-  
+    
         for (const payer of users) {
-          if (payer.id !== claimant.id && payer.claims === 0 && payer.balance > 0) {
+            if (payer.id !== claimant.id && payer.claims === 0 && payer.balance > 0) {
             while (toPay > 0 && payer.balance > 0) {
-              const payment = Math.min(payer.balance, toPay);
-              payer.balance -= payment;
-              toPay -= payment;
-              claimant.claims -= payment;
-              payer.transactions++;
-
-             // Record the transaction in the transactions table
-             insertTransaction(payer.id, claimant.id, payment, false, false, true)
-             .then(() => {
-               console.log(`User ${payer.id} pays $${payment.toFixed(2)} to User ${claimant.id}.`);
-             })
-             .catch((err) => {
-               console.error("Error inserting transaction:", err);
-             });
-  
-              if (payer.transactions === 2) break;
+                const payment = Math.min(payer.balance, toPay);
+                payer.balance -= payment;
+                toPay -= payment;
+                claimant.claims -= payment;
+                payer.transactions++;
+    
+                // Record the transaction in the transactions table
+                try {
+                await insertTransaction(payer.id, claimant.id, payment, false, false, false);
+                console.log(`User ${payer.id} pays $${payment.toFixed(2)} to User ${claimant.id}.`);
+                } catch (err) {
+                console.error("Error inserting transaction:", err);
+                }
+    
+                if (payer.transactions === 2) break;
             }
-          }
-          if (toPay <= 0) break;
+            }
+            if (toPay <= 0) break;
         }
-      }
-    });
+        }
+    }
   
     // Step 3: Cover remaining claims using the shared fund
     users.forEach((claimant) => {
@@ -195,15 +194,23 @@ export async function simulateClaimsProcess() {
     });
     console.log(`Shared fund: $${sharedFund.value.toFixed(2)}`);
 
-    fetchAllTransactions().then((transactions) => {
-        transactions.forEach((transaction) => {
-          console.log(`Transaction ID: ${transaction.id}, From User: ${transaction.from_user_id}, To User: ${transaction.to_user_id}, Amount: $${transaction.amount.toFixed(2)}`);
-        });
-      }).catch((err) => {
-        console.error("Error fetching transactions:", err);
+    fetchAllTransactions()
+    .then((transactions) => {
+      if (transactions.length === 0) {
+        console.log("No transactions found.");
+        return;
+      }
+      transactions.forEach((transaction) => {
+        console.log(
+          `Transaction ID: ${transaction.id}, From User: ${transaction.from_user_id}, To User: ${transaction.to_user_id}, Amount: $${transaction.amount.toFixed(2)}`
+        );
       });
+    })
+    .catch((err) => {
+      console.error("Error fetching transactions:", err);
+    });
 
-      
+
     // Reset for the next month
     console.log("Resetting data for the next month...");
     resetForNextMonth(allUsersForProcessing);

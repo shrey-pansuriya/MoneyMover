@@ -24,6 +24,20 @@ export const createUserInfoTable = (): Promise<void> => {
     }
 
     db.transaction(tx => {
+      // Drop the table if it already exists
+      tx.executeSql(
+        `DROP TABLE IF EXISTS user_info;`,
+        [],
+        () => {
+          console.log("Dropped existing user_info table (if it existed).");
+        },
+        (_, error) => {
+          console.error("Error dropping table: ", error.message);
+          reject(error);
+        }
+      );
+
+      // Create the user_info table
       tx.executeSql(
         `CREATE TABLE IF NOT EXISTS user_info (
           user_id INTEGER PRIMARY KEY AUTOINCREMENT, 
@@ -47,6 +61,7 @@ export const createUserInfoTable = (): Promise<void> => {
     });
   });
 };
+
 
 // Function to insert user info with a Promise
 export const insertUserInfo = (firstName: string, lastName: string, age: number, address: string, phone: string): Promise<number | null> => {
@@ -108,7 +123,6 @@ export const fetchUserInfo = (): Promise<any[]> => {
   });
 };
 
-
 // Function to create the user_login table with a Promise
 export const createUserLoginTable = (): Promise<void> => {
   return new Promise((resolve, reject) => {
@@ -118,6 +132,20 @@ export const createUserLoginTable = (): Promise<void> => {
     }
 
     db.transaction((tx) => {
+      // Drop the table if it exists
+      tx.executeSql(
+        `DROP TABLE IF EXISTS user_login;`,
+        [],
+        () => {
+          console.log("Dropped existing user_login table (if it existed).");
+        },
+        (_, error) => {
+          console.error("Error dropping table: ", error.message);
+          reject(error);
+        }
+      );
+
+      // Create the user_login table
       tx.executeSql(
         `CREATE TABLE IF NOT EXISTS user_login (
           user_id INTEGER PRIMARY KEY,              -- Linked to user_info table
@@ -138,6 +166,7 @@ export const createUserLoginTable = (): Promise<void> => {
     });
   });
 };
+
 // Function to insert user login details with a Promise
 export const insertUserLogin = (userId: number, email: string, password: string): Promise<void> => {
   return new Promise((resolve, reject) => {
@@ -177,21 +206,22 @@ export const createUserSubscriptionTable = (): Promise<void> => {
         [],
         () => {
           console.log("Dropped old user_subscription table.");
-          // Create the new table
+
+          // Create the new user_subscription table
           tx.executeSql(
             `CREATE TABLE user_subscription (
-               id INTEGER PRIMARY KEY AUTOINCREMENT, 
-               user_id INTEGER, 
-               plan_name TEXT, 
-               amount INTEGER, 
-               balance REAL DEFAULT 0, 
-               transactions INTEGER DEFAULT 0, 
-               is_active BOOLEAN, 
-               purchase_date DATE, 
-               claim_priority INTEGER, 
-               last_updated DATE DEFAULT (datetime('now', 'localtime')), 
-               FOREIGN KEY(user_id) REFERENCES user_info(user_id)
-             );`,
+              id INTEGER PRIMARY KEY AUTOINCREMENT, 
+              user_id INTEGER, 
+              plan_name TEXT, 
+              amount INTEGER, 
+              balance REAL DEFAULT 0, 
+              transactions INTEGER DEFAULT 0, 
+              is_active BOOLEAN, 
+              purchase_date DATE, 
+              claim_priority INTEGER, 
+              last_updated DATE DEFAULT (datetime('now', 'localtime')), 
+              FOREIGN KEY(user_id) REFERENCES user_info(user_id)
+            );`,
             [],
             () => {
               console.log("User subscription table created successfully");
@@ -413,23 +443,36 @@ export const createClaimsListTable = (): Promise<void> => {
     }
 
     db.transaction(tx => {
+      // Drop the old table if it exists
       tx.executeSql(
-        `CREATE TABLE IF NOT EXISTS claims_list (
-          claim_id INTEGER PRIMARY KEY AUTOINCREMENT,
-          user_id INTEGER,
-          claim_amount REAL NOT NULL,
-          claim_date DATE NOT NULL DEFAULT (datetime('now', 'localtime')),
-          status TEXT DEFAULT 'pending', 
-          priority INTEGER NOT NULL, 
-          FOREIGN KEY(user_id) REFERENCES user_info(user_id)
-        );`,
+        `DROP TABLE IF EXISTS claims_list;`,
         [],
         () => {
-          console.log("Claims list table created successfully");
-          resolve();
+          console.log("Dropped old claims_list table.");
+          // Create the new claims_list table
+          tx.executeSql(
+            `CREATE TABLE claims_list (
+              claim_id INTEGER PRIMARY KEY AUTOINCREMENT,
+              user_id INTEGER,
+              claim_amount REAL NOT NULL,
+              claim_date DATE NOT NULL DEFAULT (datetime('now', 'localtime')),
+              status TEXT DEFAULT 'pending',
+              priority INTEGER NOT NULL,
+              FOREIGN KEY(user_id) REFERENCES user_info(user_id)
+            );`,
+            [],
+            () => {
+              console.log("Claims list table created successfully");
+              resolve();
+            },
+            (_, error) => {
+              console.error("Error creating claims_list table: ", error.message);
+              reject(error);
+            }
+          );
         },
         (_, error) => {
-          console.error("Error creating claims_list table: ", error.message);
+          console.error("Error dropping old claims_list table: ", error.message);
           reject(error);
         }
       );
@@ -832,26 +875,52 @@ export const createTransactionsTable = (): Promise<void> => {
     console.log('Starting transaction...');
 
     db.transaction(tx => {
-      // Create transactions table with necessary columns
+      // Drop the transactions table (only for development/testing, not recommended for production)
       tx.executeSql(
-        `CREATE TABLE IF NOT EXISTS transactions (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          from_user_id INTEGER NOT NULL,
-          to_user_id INTEGER NOT NULL,
-          amount REAL NOT NULL,
-          transfer_accepted BOOLEAN DEFAULT FALSE,
-          incoming_payment BOOLEAN DEFAULT FALSE,
-          outgoing_payment BOOLEAN DEFAULT FALSE,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );`,
+        `DROP TABLE IF EXISTS transactions;`,
         [],
         () => {
-          console.log("Transactions table created successfully with all columns.");
-          resolve();
+          console.log("Dropped existing transactions table (if it existed).");
+
+          // Create transactions table with necessary columns
+          tx.executeSql(
+            `CREATE TABLE IF NOT EXISTS transactions (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              from_user_id INTEGER NOT NULL,
+              to_user_id INTEGER NOT NULL,
+              amount REAL NOT NULL,
+              all_transfer_accepted BOOLEAN DEFAULT FALSE,
+              confirmation_by_sender BOOLEAN DEFAULT FALSE,
+              confirmation_by_reciever BOOLEAN DEFAULT FALSE,
+              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+              updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );`,
+            [],
+            () => {
+              console.log("Transactions table created successfully with all columns.");
+              
+              // Log the schema of the created table
+              tx.executeSql(
+                "PRAGMA table_info(transactions);", // Query to get table schema
+                [],
+                (_, result) => {
+                  console.log("Table schema details:", result.rows.raw()); // Logs schema details
+                  resolve();
+                },
+                (_, error) => {
+                  console.error("Error fetching table schema:", error.message);
+                  reject(error);
+                }
+              );
+            },
+            (_, error) => {
+              console.error("Error creating transactions table: ", error.message);
+              reject(error);
+            }
+          );
         },
         (_, error) => {
-          console.error("Error creating transactions table: ", error.message);
+          console.error("Error dropping transactions table: ", error.message);
           reject(error);
         }
       );
@@ -861,12 +930,12 @@ export const createTransactionsTable = (): Promise<void> => {
 
 
 export const insertTransaction = (
-  fromUserId: number, 
-  toUserId: number, 
-  amount: number, 
-  transferAccepted: boolean = false, 
-  incomingPayment: boolean = false, 
-  outgoingPayment: boolean = false
+  fromUserId: number,
+  toUserId: number,
+  amount: number,
+  all_transfer_accepted: boolean = false,
+  confirmation_by_sender: boolean = false,
+  confirmation_by_reciever: boolean = false
 ): Promise<void> => {
   return new Promise((resolve, reject) => {
     if (!db) {
@@ -874,30 +943,33 @@ export const insertTransaction = (
       return;
     }
 
-    db.transaction(tx => {
-      // Insert a new transaction record
-      tx.executeSql(
-        `INSERT INTO transactions (
-           from_user_id, 
-           to_user_id, 
-           amount, 
-           transfer_accepted, 
-           incoming_payment, 
-           outgoing_payment
-         ) VALUES (?, ?, ?, ?, ?, ?)`,
-        [fromUserId, toUserId, amount, transferAccepted, incomingPayment, outgoingPayment],
-        () => {
-          console.log("Transaction inserted successfully");
-          resolve();
+    db.transaction(tx => {          
+          // Now, proceed with inserting the transaction
+          tx.executeSql(
+            `INSERT INTO transactions (
+              from_user_id, 
+              to_user_id, 
+              amount, 
+              all_transfer_accepted, 
+              confirmation_by_sender, 
+              confirmation_by_reciever
+            ) VALUES (?, ?, ?, ?, ?, ?)`,
+            [fromUserId, toUserId, amount, +all_transfer_accepted, +confirmation_by_sender, +confirmation_by_reciever],
+            () => {
+              console.log("Transaction inserted successfully");
+              resolve();
+            },
+            (_, error) => {
+              console.error("Error inserting transaction:", error.message);
+              reject(error);
+            }
+          );
         },
-        (_, error) => {
-          console.error("Error inserting transaction: ", error.message);
-          reject(error);
-        }
       );
     });
-  });
 };
+
+
 
 export const fetchAllTransactions = (): Promise<any[]> => {
   return new Promise((resolve, reject) => {
@@ -960,7 +1032,6 @@ export const initializeDatabase = async (): Promise<void> => {
     await createClaimsListTable();  // Create claims_list table
     await createFundingsTable();  // Create fundings table
     await createTransactionsTable();  // Create transactions table
-    
 
     console.log("All tables initialized successfully");
   } catch (error) {
@@ -971,20 +1042,14 @@ export const initializeDatabase = async (): Promise<void> => {
 export const populateDatabaseForSimulation = async () => {
   try {
     // Insert users into the user_info table
+    console.log("moving on to inserting user info");
+
     const user1Id = await insertUserInfo("John", "Doe", 30, "123 Main St", "555-1234");
     const user2Id = await insertUserInfo("Jane", "Smith", 28, "456 Elm St", "555-5678");
     const user3Id = await insertUserInfo("Mike", "Johnson", 35, "789 Oak St", "555-9876");
     const user4Id = await insertUserInfo("Emily", "Davis", 40, "101 Pine St", "555-4567");
     const user5Id = await insertUserInfo("Chris", "Brown", 33, "202 Birch St", "555-7890");
 
-    console.log("Moving on to inserting logins");
-
-    // Insert login details for each user into the user_login table
-    if (user1Id) await insertUserLogin(user1Id, "john.doe@example.com", "password123");
-    if (user2Id) await insertUserLogin(user2Id, "jane.smith@example.com", "securepassword");
-    if (user3Id) await insertUserLogin(user3Id, "mike.johnson@example.com", "mypassword");
-    if (user4Id) await insertUserLogin(user4Id, "emily.davis@example.com", "password456");
-    if (user5Id) await insertUserLogin(user5Id, "chris.brown@example.com", "adminpassword");
 
     console.log("moving on to inserting subscriptions");
 
